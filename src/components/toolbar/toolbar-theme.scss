@@ -12,6 +12,10 @@ md-toolbar.md-THEME_NAME-theme:not(.md-menu-toolbar) {
     fill: '{{primary-contrast-0.26}}';
   }
 
+  .md-button:not(.md-raised) {
+    color: '{{primary-contrast}}';
+  }
+
   &.md-accent {
     background-color: '{{accent-color}}';
     color: '{{accent-contrast}}';
