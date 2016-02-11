@@ -1,0 +1,14 @@
+.mdtTable.md-THEME_NAME-theme {
+
+  background-color: #FFFFFF;
+  color: #323232;
+
+  .selectedRow {
+    background-color: '{{primary-color}}';
+    color: #FFFFFF;
+
+    md-icon {
+      color: #FFFFFF !important;
+    }
+  }
+}
