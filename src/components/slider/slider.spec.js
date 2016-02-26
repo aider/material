@@ -366,6 +366,8 @@ describe('md-slider', function() {
 
     pageScope.$digest();
 
+    pageScope.$digest();
+
     // Doesn't add active class on pressdown when disabled
     wrapper.triggerHandler({
       type: '$md.pressdown',
@@ -385,6 +387,8 @@ describe('md-slider', function() {
   it('should disable via the `disabled` attribute', function() {
     var slider = setup('disabled');
     var wrapper = getWrapper(slider);
+
+    pageScope.$digest();
 
     pageScope.$digest();
 
