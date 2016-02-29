@@ -46,8 +46,6 @@
                 link: function (scope, elem, attrs) {
                     var self = scope;
 
-                    scope.onMenuSelected({menuItem: 'aaa'});
-
                     scope.onDropdownMenuSelected = function (menuItem, menu) {
                         scope.onMenuSelected({menuItem: menuItem});
                     };
@@ -76,58 +74,64 @@
                         bodyElem.append(menuListElem);
 
 
-                        bodyElem.on('click', function () {
+                        bodyElem.on('click', function (event) {
                             scope.contextMenuState.display = 'none';
                             scope.contextMenuState.isVisible = false;
 
                             scope.$digest();
                         });
 
-                        // elem.bind('touchstart', function(evt) {
-                        //     // Locally scoped variable that will keep track of the long press
-                        //     scope.longPress = true;
-                        //     var self = this;
-                        //     var event = evt;
-                        //     // We'll set a timeout for 600 ms for a long press
-                        //     $timeout(function() {
-                        //         if (scope.longPress) {
-                        //             // If the touchend event hasn't fired,
-                        //             // apply the function given in on the element's on-long-press attribute
-                        //             // $scope.$apply(function() {
-                        //             //     $scope.$eval($attrs.onLongPress)
-                        //             // });
-                        //
-                        //             var left, top, offset;
-                        //
-                        //             if (scope.onPopup()) {
-                        //                 left = event.originalEvent.pageX;
-                        //                 top = event.originalEvent.pageY;
-                        //                 offset = Util.offset(self);
-                        //
-                        //                 if (left + menuListElem[0].clientWidth > offset.left + self.clientWidth) {
-                        //                     left -= (left + menuListElem[0].clientWidth) - (offset.left + self.clientWidth);
-                        //                 }
-                        //                 if (top + menuListElem[0].clientHeight > offset.top + self.clientHeight) {
-                        //                     top -= (top + menuListElem[0].clientHeight) - (offset.top + self.clientHeight);
-                        //                 }
-                        //
-                        //                 scope.contextMenuState.left = (left+20) + 'px';
-                        //                 scope.contextMenuState.top = top + 'px';
-                        //                 scope.contextMenuState.visibility = 'visible';
-                        //                 scope.contextMenuState.display = 'block';
-                        //                 scope.contextMenuState.isVisible = true;
-                        //             }
-                        //
-                        //             scope.$digest();
-                        //             event.preventDefault();
-                        //
-                        //         }
-                        //     }, 600);
-                        // });
-                        elem.bind('touchend', function(event) {
-                            // if(scope.longPress) {
-                                var left, top, offset;
+                        elem.bind('touchstart', function (evt) {
+                            scope.touchend = false;
+                            scope.longPress = false;
+                            var self = this;
+                            var event = evt;
+                            console.log('touchstart');
+                            $timeout(function () {
+                                console.log('touchstart[end:' + scope.touchend + "]");
+                                if (!scope.touchend) {
+                                    scope.longPress = true;
+                                }
 
+                                // if (scope.longPress) {
+                                //     // If the touchend event hasn't fired,
+                                //     // apply the function given in on the element's on-long-press attribute
+                                //     // $scope.$apply(function() {
+                                //     //     $scope.$eval($attrs.onLongPress)
+                                //     // });
+                                //
+                                //     var left, top, offset;
+                                //
+                                //     if (scope.onPopup()) {
+                                //         left = event.originalEvent.pageX;
+                                //         top = event.originalEvent.pageY;
+                                //         offset = Util.offset(self);
+                                //
+                                //         if (left + menuListElem[0].clientWidth > offset.left + self.clientWidth) {
+                                //             left -= (left + menuListElem[0].clientWidth) - (offset.left + self.clientWidth);
+                                //         }
+                                //         if (top + menuListElem[0].clientHeight > offset.top + self.clientHeight) {
+                                //             top -= (top + menuListElem[0].clientHeight) - (offset.top + self.clientHeight);
+                                //         }
+                                //
+                                //         scope.contextMenuState.left = (left) + 'px';
+                                //         scope.contextMenuState.top = top + 'px';
+                                //         scope.contextMenuState.visibility = 'visible';
+                                //         scope.contextMenuState.display = 'block';
+                                //         scope.contextMenuState.isVisible = true;
+                                //     }
+                                //
+                                //     scope.$digest();
+                                //     event.stopPropagation();
+                                //
+                                // }
+                            }, 600);
+                        });
+                        elem.bind('touchend', function (event) {
+                            scope.touchend = true;
+                            if (scope.longPress) {
+                                scope.menuVisible = true;
+                                var left, top, offset;
                                 if (scope.onPopup()) {
                                     left = event.originalEvent.pageX;
                                     top = event.originalEvent.pageY;
@@ -140,17 +144,17 @@
                                         top -= (top + menuListElem[0].clientHeight) - (offset.top + self.clientHeight);
                                     }
 
-                                    scope.contextMenuState.left = (left+20) + 'px';
+                                    scope.contextMenuState.left = (left) + 'px';
                                     scope.contextMenuState.top = top + 'px';
                                     scope.contextMenuState.visibility = 'visible';
                                     scope.contextMenuState.display = 'block';
                                     scope.contextMenuState.isVisible = true;
                                 }
-
+                                scope.longPress = false;
                                 scope.$digest();
                                 event.preventDefault();
-                            // }
-                            // scope.longPress = false;
+
+                            }
                         });
 
                         elem.on('contextmenu', function (event) {
@@ -197,34 +201,25 @@
     function onLongPress($timeout) {
         return {
             restrict: 'A',
-            link: function($scope, $elm, $attrs) {
-                $elm.bind('touchstart', function(evt) {
+            link: function ($scope, $elm, $attrs) {
+                $elm.bind('touchstart', function (evt) {
                     // Locally scoped variable that will keep track of the long press
-                    $scope.longPress = true;
-                
-                    // We'll set a timeout for 600 ms for a long press
-                    $timeout(function() {
-                        if ($scope.longPress) {
-                            // If the touchend event hasn't fired,
-                            // apply the function given in on the element's on-long-press attribute
-                            $scope.$apply(function() {
-                                $scope.$eval($attrs.onLongPress)
-                            });
-                        }
-                    }, 600);
+                    $scope.$apply(function () {
+                        $scope.$eval($attrs.onLongPress)
+                    });
                 });
 
-                $elm.bind('touchend', function(evt) {
-                    // Prevent the onLongPress event from firing
-                    console.log('touchend');
-                    $scope.longPress = false;
-                    // If there is an on-touch-end function attached to this element, apply it
-                    if ($attrs.onTouchEnd) {
-                        $scope.$apply(function() {
-                            $scope.$eval($attrs.onTouchEnd)
-                        });
-                    }
-                });
+                // $elm.bind('touchend', function (evt) {
+                //     // Prevent the onLongPress event from firing
+                //     console.log('touchend');
+                //     $scope.longPress = false;
+                //     // If there is an on-touch-end function attached to this element, apply it
+                //     if ($attrs.onTouchEnd) {
+                //         $scope.$apply(function () {
+                //             $scope.$eval($attrs.onTouchEnd)
+                //         });
+                //     }
+                // });
             }
         };
     }
@@ -572,6 +567,26 @@
                 return input;
             }
         });
+}());
+(function(){
+    'use strict';
+
+    function ColumnAlignmentHelper(ColumnOptionProvider){
+        var service = this;
+        service.getColumnAlignClass = getColumnAlignClass;
+
+        function getColumnAlignClass(alignRule) {
+            if (alignRule === ColumnOptionProvider.ALIGN_RULE.ALIGN_RIGHT) {
+                return 'rightAlignedColumn';
+            } else {
+                return 'leftAlignedColumn';
+            }
+        }
+    }
+
+    angular
+        .module('material.components.table')
+        .service('ColumnAlignmentHelper', ColumnAlignmentHelper);
 }());
 (function () {
     'use strict';
@@ -1000,26 +1015,6 @@
     angular
         .module('material.components.table')
         .service('mdtPaginationHelperFactory', mdtPaginationHelperFactory);
-}());
-(function(){
-    'use strict';
-
-    function ColumnAlignmentHelper(ColumnOptionProvider){
-        var service = this;
-        service.getColumnAlignClass = getColumnAlignClass;
-
-        function getColumnAlignClass(alignRule) {
-            if (alignRule === ColumnOptionProvider.ALIGN_RULE.ALIGN_RIGHT) {
-                return 'rightAlignedColumn';
-            } else {
-                return 'leftAlignedColumn';
-            }
-        }
-    }
-
-    angular
-        .module('material.components.table')
-        .service('ColumnAlignmentHelper', ColumnAlignmentHelper);
 }());
 (function(){
     'use strict';
