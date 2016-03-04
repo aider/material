@@ -81,81 +81,85 @@
                             scope.$digest();
                         });
 
-                        elem.bind('touchstart', function (evt) {
-                            scope.touchend = false;
-                            scope.longPress = false;
-                            var self = this;
-                            var event = evt;
-                            console.log('touchstart');
-                            $timeout(function () {
-                                console.log('touchstart[end:' + scope.touchend + "]");
-                                if (!scope.touchend) {
-                                    scope.longPress = true;
-                                }
+                        var isIOs = /iPhone|iPod|iPad/i.test(navigator.userAgent);
 
-                                // if (scope.longPress) {
-                                //     // If the touchend event hasn't fired,
-                                //     // apply the function given in on the element's on-long-press attribute
-                                //     // $scope.$apply(function() {
-                                //     //     $scope.$eval($attrs.onLongPress)
-                                //     // });
-                                //
-                                //     var left, top, offset;
-                                //
-                                //     if (scope.onPopup()) {
-                                //         left = event.originalEvent.pageX;
-                                //         top = event.originalEvent.pageY;
-                                //         offset = Util.offset(self);
-                                //
-                                //         if (left + menuListElem[0].clientWidth > offset.left + self.clientWidth) {
-                                //             left -= (left + menuListElem[0].clientWidth) - (offset.left + self.clientWidth);
-                                //         }
-                                //         if (top + menuListElem[0].clientHeight > offset.top + self.clientHeight) {
-                                //             top -= (top + menuListElem[0].clientHeight) - (offset.top + self.clientHeight);
-                                //         }
-                                //
-                                //         scope.contextMenuState.left = (left) + 'px';
-                                //         scope.contextMenuState.top = top + 'px';
-                                //         scope.contextMenuState.visibility = 'visible';
-                                //         scope.contextMenuState.display = 'block';
-                                //         scope.contextMenuState.isVisible = true;
-                                //     }
-                                //
-                                //     scope.$digest();
-                                //     event.stopPropagation();
-                                //
-                                // }
-                            }, 600);
-                        });
-                        elem.bind('touchend', function (event) {
-                            scope.touchend = true;
-                            if (scope.longPress) {
-                                scope.menuVisible = true;
-                                var left, top, offset;
-                                if (scope.onPopup()) {
-                                    left = event.originalEvent.pageX;
-                                    top = event.originalEvent.pageY;
-                                    offset = Util.offset(self);
-
-                                    if (left + menuListElem[0].clientWidth > offset.left + self.clientWidth) {
-                                        left -= (left + menuListElem[0].clientWidth) - (offset.left + self.clientWidth);
-                                    }
-                                    if (top + menuListElem[0].clientHeight > offset.top + self.clientHeight) {
-                                        top -= (top + menuListElem[0].clientHeight) - (offset.top + self.clientHeight);
-                                    }
-
-                                    scope.contextMenuState.left = (left) + 'px';
-                                    scope.contextMenuState.top = top + 'px';
-                                    scope.contextMenuState.visibility = 'visible';
-                                    scope.contextMenuState.display = 'block';
-                                    scope.contextMenuState.isVisible = true;
-                                }
+                        if (isIOs) {
+                            elem.bind('touchstart', function (evt) {
+                                scope.touchend = false;
                                 scope.longPress = false;
-                                scope.$digest();
-                                event.preventDefault();
+                                var self = this;
+                                var event = evt;
+                                console.log('touchstart');
+                                $timeout(function () {
+                                    console.log('touchstart[end:' + scope.touchend + "]");
+                                    if (!scope.touchend) {
+                                        scope.longPress = true;
+                                    }
 
-                            }
-                        });
+                                    // if (scope.longPress) {
+                                    //     // If the touchend event hasn't fired,
+                                    //     // apply the function given in on the element's on-long-press attribute
+                                    //     // $scope.$apply(function() {
+                                    //     //     $scope.$eval($attrs.onLongPress)
+                                    //     // });
+                                    //
+                                    //     var left, top, offset;
+                                    //
+                                    //     if (scope.onPopup()) {
+                                    //         left = event.originalEvent.pageX;
+                                    //         top = event.originalEvent.pageY;
+                                    //         offset = Util.offset(self);
+                                    //
+                                    //         if (left + menuListElem[0].clientWidth > offset.left + self.clientWidth) {
+                                    //             left -= (left + menuListElem[0].clientWidth) - (offset.left + self.clientWidth);
+                                    //         }
+                                    //         if (top + menuListElem[0].clientHeight > offset.top + self.clientHeight) {
+                                    //             top -= (top + menuListElem[0].clientHeight) - (offset.top + self.clientHeight);
+                                    //         }
+                                    //
+                                    //         scope.contextMenuState.left = (left) + 'px';
+                                    //         scope.contextMenuState.top = top + 'px';
+                                    //         scope.contextMenuState.visibility = 'visible';
+                                    //         scope.contextMenuState.display = 'block';
+                                    //         scope.contextMenuState.isVisible = true;
+                                    //     }
+                                    //
+                                    //     scope.$digest();
+                                    //     event.stopPropagation();
+                                    //
+                                    // }
+                                }, 600);
+                            });
+                            elem.bind('touchend', function (event) {
+                                scope.touchend = true;
+                                if (scope.longPress) {
+                                    scope.menuVisible = true;
+                                    var left, top, offset;
+                                    if (scope.onPopup()) {
+                                        left = event.originalEvent.pageX;
+                                        top = event.originalEvent.pageY;
+                                        offset = Util.offset(self);
+
+                                        if (left + menuListElem[0].clientWidth > offset.left + self.clientWidth) {
+                                            left -= (left + menuListElem[0].clientWidth) - (offset.left + self.clientWidth);
+                                        }
+                                        if (top + menuListElem[0].clientHeight > offset.top + self.clientHeight) {
+                                            top -= (top + menuListElem[0].clientHeight) - (offset.top + self.clientHeight);
+                                        }
+
+                                        scope.contextMenuState.left = (left) + 'px';
+                                        scope.contextMenuState.top = top + 'px';
+                                        scope.contextMenuState.visibility = 'visible';
+                                        scope.contextMenuState.display = 'block';
+                                        scope.contextMenuState.isVisible = true;
+                                    }
+                                    scope.longPress = false;
+                                    scope.$digest();
+                                    event.preventDefault();
+
+                                }
+                            });
+                        }
 
                         elem.on('contextmenu', function (event) {
                             var left, top, offset;
@@ -371,10 +375,15 @@
 
                     vm.addRowData = _.bind($scope.tableDataStorageService.addRowData, $scope.tableDataStorageService);
 
+                    $scope.tableDataCnt = 0;
                     var unbindWatchMdtModel = $scope.$watch('mdtModel', function (data) {
                         $scope.$watchCollection('mdtModel.data', function (data) {
                             if (data) {
-                                $scope.tableDataIsReady = true;
+                                $scope.tableDataCnt++;
+                                if ($scope.tableDataCnt > 1) {
+                                    $scope.tableDataCnt = 0;
+                                    $scope.tableDataIsReady = true;
+                                }
                                 $scope.tableDataStorageService.initModel($scope.mdtModel, $scope.mdtSelectFn, $scope.mdtDblclickFn, $scope.mdtContextMenuFn, $scope.onPopup);
                                 if ($scope.mdtPaginationHelper.getRows().length) {
                                     $scope.tableIsReady = false;
@@ -571,39 +580,6 @@
                 return input;
             }
         });
-}());
-(function(){
-    'use strict';
-
-    var ColumnOptionProvider = {
-        ALIGN_RULE : {
-            ALIGN_LEFT: 'left',
-            ALIGN_RIGHT: 'right'
-        }
-    };
-
-    angular.module('material.components.table')
-        .value('ColumnOptionProvider', ColumnOptionProvider);
-})();
-(function(){
-    'use strict';
-
-    function ColumnAlignmentHelper(ColumnOptionProvider){
-        var service = this;
-        service.getColumnAlignClass = getColumnAlignClass;
-
-        function getColumnAlignClass(alignRule) {
-            if (alignRule === ColumnOptionProvider.ALIGN_RULE.ALIGN_RIGHT) {
-                return 'rightAlignedColumn';
-            } else {
-                return 'leftAlignedColumn';
-            }
-        }
-    }
-
-    angular
-        .module('material.components.table')
-        .service('ColumnAlignmentHelper', ColumnAlignmentHelper);
 }());
 (function () {
     'use strict';
@@ -1033,6 +1009,39 @@
         .module('material.components.table')
         .service('mdtPaginationHelperFactory', mdtPaginationHelperFactory);
 }());
+(function(){
+    'use strict';
+
+    function ColumnAlignmentHelper(ColumnOptionProvider){
+        var service = this;
+        service.getColumnAlignClass = getColumnAlignClass;
+
+        function getColumnAlignClass(alignRule) {
+            if (alignRule === ColumnOptionProvider.ALIGN_RULE.ALIGN_RIGHT) {
+                return 'rightAlignedColumn';
+            } else {
+                return 'leftAlignedColumn';
+            }
+        }
+    }
+
+    angular
+        .module('material.components.table')
+        .service('ColumnAlignmentHelper', ColumnAlignmentHelper);
+}());
+(function(){
+    'use strict';
+
+    var ColumnOptionProvider = {
+        ALIGN_RULE : {
+            ALIGN_LEFT: 'left',
+            ALIGN_RIGHT: 'right'
+        }
+    };
+
+    angular.module('material.components.table')
+        .value('ColumnOptionProvider', ColumnOptionProvider);
+})();
 (function () {
     'use strict';
 
@@ -1181,6 +1190,133 @@
     angular
         .module('material.components.table')
         .directive('mdtRow', mdtRowDirective);
+}());
+(function(){
+    'use strict';
+
+    /**
+     * @ngdoc directive
+     * @name mdtColumn
+     * @restrict E
+     * @requires mdtTable
+     *
+     * @description
+     * Representing a header column cell which should be placed inside `mdt-header-row` element directive.
+     *
+     * @param {string=} alignRule align cell content. This settings will have affect on each data cells in the same
+     *  column (e.g. every x.th cell in every row).
+     *
+     *  Assignable values:
+     *    - 'left'
+     *    - 'right'
+     *
+     * @param {function()=} sortBy compareFunction callback for sorting the column data's. As every compare function,
+     *  should get two parameters and return with the comapred result (-1,1,0)
+     *
+     * @param {string=} columnDefinition displays a tooltip on hover.
+     *
+     * @example
+     * <pre>
+     *  <mdt-table>
+     *      <mdt-header-row>
+     *          <mdt-column align-rule="left">Product name</mdt-column>
+     *          <mdt-column
+     *              align-rule="right"
+     *              column-definition="The price of the product in gross.">Price</mdt-column>
+     *      </mdt-header-row>
+     *
+     *      <mdt-row ng-repeat="product in ctrl.products">
+     *          <mdt-cell>{{product.name}}</mdt-cell>
+     *          <mdt-cell>{{product.price}}</mdt-cell>
+     *      </mdt-row>
+     *  </mdt-table>
+     * </pre>
+     */
+    function mdtColumnDirective(){
+        return {
+            restrict: 'E',
+            transclude: true,
+            replace: true,
+            scope: {
+                alignRule: '@',
+                sortBy: '=',
+                columnDefinition: '@'
+            },
+            require: ['^mdtTable'],
+            link: function ($scope, element, attrs, ctrl, transclude) {
+                var mdtTableCtrl = ctrl[0];
+
+                transclude(function (clone) {
+                    mdtTableCtrl.addHeaderCell({
+                        alignRule: $scope.alignRule,
+                        sortBy: $scope.sortBy,
+                        columnDefinition: $scope.columnDefinition,
+                        columnName: clone.html()
+                    });
+                });
+            }
+        };
+    }
+
+    angular
+        .module('material.components.table')
+        .directive('mdtColumn', mdtColumnDirective);
+}());
+(function(){
+    'use strict';
+
+    function mdtGeneratedHeaderCellContentDirective(){
+        return {
+            restrict: 'E',
+            templateUrl: '/main/templates/mdtGeneratedHeaderCellContent.html',
+            replace: true,
+            scope: false,
+            link: function(){
+
+            }
+        };
+    }
+
+    angular
+        .module('material.components.table')
+        .directive('mdtGeneratedHeaderCellContent', mdtGeneratedHeaderCellContentDirective);
+}());
+(function(){
+    'use strict';
+
+    /**
+     * @ngdoc directive
+     * @name mdtHeaderRow
+     * @restrict E
+     * @requires mdtTable
+     *
+     * @description
+     * Representing a header row which should be placed inside `mdt-table` element directive.
+     * The main responsibility of this directive is to execute all the transcluded `mdt-column` element directives.
+     *
+     */
+    function mdtHeaderRowDirective(){
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            require: '^mdtTable',
+            scope: true,
+            link: function($scope, element, attrs, mdtCtrl, transclude){
+                appendColumns();
+
+                function appendColumns(){
+                    transclude(function (clone) {
+                        element.append(clone);
+                    });
+                }
+            }
+        };
+    }
+
+    angular
+        .module('material.components.table')
+        .directive('mdtHeaderRow', mdtHeaderRowDirective);
 }());
 (function(){
     'use strict';
@@ -1339,133 +1475,6 @@
     }
 })();
 
-(function(){
-    'use strict';
-
-    /**
-     * @ngdoc directive
-     * @name mdtColumn
-     * @restrict E
-     * @requires mdtTable
-     *
-     * @description
-     * Representing a header column cell which should be placed inside `mdt-header-row` element directive.
-     *
-     * @param {string=} alignRule align cell content. This settings will have affect on each data cells in the same
-     *  column (e.g. every x.th cell in every row).
-     *
-     *  Assignable values:
-     *    - 'left'
-     *    - 'right'
-     *
-     * @param {function()=} sortBy compareFunction callback for sorting the column data's. As every compare function,
-     *  should get two parameters and return with the comapred result (-1,1,0)
-     *
-     * @param {string=} columnDefinition displays a tooltip on hover.
-     *
-     * @example
-     * <pre>
-     *  <mdt-table>
-     *      <mdt-header-row>
-     *          <mdt-column align-rule="left">Product name</mdt-column>
-     *          <mdt-column
-     *              align-rule="right"
-     *              column-definition="The price of the product in gross.">Price</mdt-column>
-     *      </mdt-header-row>
-     *
-     *      <mdt-row ng-repeat="product in ctrl.products">
-     *          <mdt-cell>{{product.name}}</mdt-cell>
-     *          <mdt-cell>{{product.price}}</mdt-cell>
-     *      </mdt-row>
-     *  </mdt-table>
-     * </pre>
-     */
-    function mdtColumnDirective(){
-        return {
-            restrict: 'E',
-            transclude: true,
-            replace: true,
-            scope: {
-                alignRule: '@',
-                sortBy: '=',
-                columnDefinition: '@'
-            },
-            require: ['^mdtTable'],
-            link: function ($scope, element, attrs, ctrl, transclude) {
-                var mdtTableCtrl = ctrl[0];
-
-                transclude(function (clone) {
-                    mdtTableCtrl.addHeaderCell({
-                        alignRule: $scope.alignRule,
-                        sortBy: $scope.sortBy,
-                        columnDefinition: $scope.columnDefinition,
-                        columnName: clone.html()
-                    });
-                });
-            }
-        };
-    }
-
-    angular
-        .module('material.components.table')
-        .directive('mdtColumn', mdtColumnDirective);
-}());
-(function(){
-    'use strict';
-
-    function mdtGeneratedHeaderCellContentDirective(){
-        return {
-            restrict: 'E',
-            templateUrl: '/main/templates/mdtGeneratedHeaderCellContent.html',
-            replace: true,
-            scope: false,
-            link: function(){
-
-            }
-        };
-    }
-
-    angular
-        .module('material.components.table')
-        .directive('mdtGeneratedHeaderCellContent', mdtGeneratedHeaderCellContentDirective);
-}());
-(function(){
-    'use strict';
-
-    /**
-     * @ngdoc directive
-     * @name mdtHeaderRow
-     * @restrict E
-     * @requires mdtTable
-     *
-     * @description
-     * Representing a header row which should be placed inside `mdt-table` element directive.
-     * The main responsibility of this directive is to execute all the transcluded `mdt-column` element directives.
-     *
-     */
-    function mdtHeaderRowDirective(){
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            require: '^mdtTable',
-            scope: true,
-            link: function($scope, element, attrs, mdtCtrl, transclude){
-                appendColumns();
-
-                function appendColumns(){
-                    transclude(function (clone) {
-                        element.append(clone);
-                    });
-                }
-            }
-        };
-    }
-
-    angular
-        .module('material.components.table')
-        .directive('mdtHeaderRow', mdtHeaderRowDirective);
-}());
 (function(){
     'use strict';
 
