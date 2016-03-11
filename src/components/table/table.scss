@@ -93,7 +93,18 @@ $checkBoxWidth: 18px;
                 left: 0;
                 right: 0;
                 bottom: 0;
-                width: 100%;
+                //width: 100%;
+                max-height: 25px;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+            .column2-body {
+                overflow: hidden;
+                position: absolute;
+                text-align: center;
+                top: 13px;
+                right: 0;
+                bottom: 0;
                 max-height: 25px;
                 text-overflow: ellipsis;
                 white-space: nowrap;
