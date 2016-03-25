@@ -1,283 +1,397 @@
 $checkBoxWidth: 18px;
 
 #details-body h1.md-toolbar-tools {
-    color: #222;
+  color: #222;
 }
 
 .mdtTable {
-    &.invisible {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  .row-header {
+    //padding: 0 16px;
+  }
+  .row-header,
+  .row-container {
+    display: flex;
+    .td {
+      .first-column-section {
+        //span {
+        white-space: nowrap;
+        -webkit-order: 1;
+        -webkit-flex: 1;
+        -webkit-flex: 0 1 auto; /*important*/
+        text-overflow: ellipsis;
+        overflow: hidden;
+        min-width: 0px; /* new algorithm mises the calculation of the width */
+        //}
+      }
+      .second-column-section {
+        -webkit-flex: 1;
+        -webkit-order: 2;
+        -webkit-flex: 1 0 auto;
+      }
+    }
+    //.td > div:last-child {
+    //  white-space: nowrap;
+    //  -webkit-order: 1;
+    //  -webkit-flex: 1;
+    //  -webkit-flex: 0 1 auto; /*important*/
+    //  text-overflow: ellipsis;
+    //  overflow: hidden;
+    //  min-width: 0px; /* new algorithm mises the calculation of the width */
+    //}
+    .th {
+      white-space: nowrap;
+      //-webkit-order:1;
+      //-webkit-flex: 1;
+      //-webkit-flex: 0 1 auto; /*important*/
+      text-overflow: ellipsis;
+      overflow: hidden;
+      min-width: 0px; /* new algorithm mises the calculation of the width */
+    }
+  }
+  .td {
+    display: -webkit-flex;
+    padding: 0 6px;
+  }
+  .th {
+    display: -webkit-flex;
+    padding: 0 6px;
+    height: 56px;
+    line-height: 56px;
+    min-height: 56px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #666666;
+    cursor: pointer;
+    white-space: nowrap;
+    position: relative;
+
+    &[disabled] {
+      cursor: auto;
+    }
+
+    &:focus {
+      outline: none;
+    }
+
+    &:hover .hoverSortIcons ng-md-icon {
+      visibility: visible;
+    }
+
+    ng-md-icon {
+      width: 16px;
+      height: 16px;
+    }
+
+    .hoverSortIcons ng-md-icon {
+      visibility: hidden;
+      fill: #b3b3b3;
+    }
+    .hoverSortIcons ng-md-icon svg {
+      -webkit-transform: rotate(90deg);
+      transform: rotate(90deg);
+    }
+
+  }
+  md-list {
+    overflow-y: auto;
+  }
+  md-list-item {
+    border-bottom: solid 1px #DDDDDD;
+    padding: 0;
+    align-items: center;
+    -webkit-align-items: center;
+    font-size: 13px;
+    height: 48px;
+    min-height: 48px;
+
+    div,
+    button {
+      padding: 0;
+    }
+  }
+
+  &.invisible {
+    visibility: hidden;
+  }
+  box-shadow: none;
+  font-size: 15px;
+  /* 12sp Roboto Medium, 54% black */
+  /* optional animation of sort icons: add class 'animate-sort-icon' to mdt-header-row to activate animation */
+  /* 64dp card header height */
+  /* 56do for last row */
+  /* column padding */
+  /* 48dp row height */
+  /* 13sp Roboto Regular, 87% black */
+  /* border separation color */
+  /* INTERACTION */
+  /* default icon color */
+  table {
+    width: 100%;
+    &:focus {
+      outline: none;
+    }
+    tr {
+      @extend .noselect;
+      cursor: default;
+      &:focus {
+        outline: none;
+      }
+    }
+    td, th {
+      padding: 0;
+      margin: 0;
+    }
+
+    th {
+      font-size: 12px;
+      font-weight: 500;
+      color: #666666;
+      cursor: pointer;
+      white-space: nowrap;
+      position: relative;
+
+      &[disabled] {
+        cursor: auto;
+      }
+
+      &:focus {
+        outline: none;
+      }
+
+      &:hover .hoverSortIcons ng-md-icon {
+        visibility: visible;
+      }
+
+      .hoverSortIcons ng-md-icon {
         visibility: hidden;
+        width: 16px;
+        height: 16px;
+        fill: #b3b3b3;
+      }
+      .hoverSortIcons ng-md-icon svg {
+        -webkit-transform: rotate(90deg);
+        transform: rotate(90deg);
+      }
     }
-    box-shadow: none;
-    font-size: 15px;
-    /* 12sp Roboto Medium, 54% black */
-    /* optional animation of sort icons: add class 'animate-sort-icon' to mdt-header-row to activate animation */
-    /* 64dp card header height */
-    /* 56do for last row */
-    /* column padding */
-    /* 48dp row height */
-    /* 13sp Roboto Regular, 87% black */
-    /* border separation color */
-    /* INTERACTION */
-    /* default icon color */
-    table {
+
+    .column-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+
+      .td {
+        padding: 0 6px;
+        overflow: hidden;
+        position: absolute;
+        top: 20px;
+        left: 0;
+        right: 0;
+        bottom: 0;
         width: 100%;
-        &:focus {
-            outline: none;
-        }
-        tr {
-            @extend .noselect;
-            cursor: default;
-            &:focus {
-                outline: none;
-            }
-        }
-        td, th {
-            padding: 0;
-            margin: 0;
-        }
-
-        th {
-            font-size: 12px;
-            font-weight: 500;
-            color: #666666;
-            cursor: pointer;
-            white-space: nowrap;
-            position: relative;
-
-            &[disabled] {
-                cursor: auto;
-            }
-
-            &:focus {
-                outline: none;
-            }
-
-            &:hover .hoverSortIcons ng-md-icon {
-                visibility: visible;
-            }
-
-            .hoverSortIcons ng-md-icon {
-                visibility: hidden;
-                width: 16px;
-                height: 16px;
-                fill: #b3b3b3;
-            }
-            .hoverSortIcons ng-md-icon svg {
-                -webkit-transform: rotate(90deg);
-                transform: rotate(90deg);
-            }
-        }
-
-        .column-container {
-            position: relative;
-            width: 100%;
-            height: 100%;
-
-            .column-header-body {
-                overflow: hidden;
-                position: absolute;
-                top: 20px;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                width: 100%;
-                max-height: 25px;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-            }
-            .column-body {
-                overflow: hidden;
-                position: absolute;
-                top: 13px;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                //width: 100%;
-                max-height: 25px;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-            }
-            .column2-body {
-                overflow: hidden;
-                position: absolute;
-                text-align: center;
-                top: 13px;
-                right: 0;
-                bottom: 0;
-                max-height: 25px;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-            }
-        }
+        max-height: 25px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .th {
+        overflow: hidden;
+        position: absolute;
+        top: 13px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        //width: 100%;
+        max-height: 25px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .column2-body {
+        overflow: hidden;
+        position: absolute;
+        text-align: center;
+        top: 13px;
+        right: 0;
+        bottom: 0;
+        max-height: 25px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
     }
+  }
 
-    #visible-header {
-        background-color: #FAFAFA;
-        border-bottom: 1px solid #eeeeee;
-        th:hover {
-            background-color: #EEEEEE;
-            color: #404040;
-        }
-    }
+  #visible-header {
+    background-color: #FAFAFA;
+    border-bottom: 1px solid #eeeeee;
+    //.th:hover {
+    //  background-color: #EEEEEE;
+    //  color: #404040;
+    //}
+  }
 
-    .noselect {
-        -webkit-touch-callout: none;
-        -webkit-user-select: none;
-        -khtml-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-    }
+  .noselect {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
 
 }
 
-.mdtTable th .sortedColumn {
-    /* when hoverSortIcons on a sorted column*/
-    /* sort icon rotated -90 degrees for descending sort */
+.mdtTable .th .sortedColumn {
+  /* when hoverSortIcons on a sorted column*/
+  /* sort icon rotated -90 degrees for descending sort */
 }
 
-.mdtTable th .sortedColumn .hoverSortIcons ng-md-icon {
-    display: none;
+.mdtTable .th .sortedColumn .hoverSortIcons ng-md-icon {
+  display: none;
 }
 
-.mdtTable th .sortedColumn ng-md-icon {
-    /* specified 16px is a fix now cause angular materia generates a 24x24 icon even the passed value is 16  */
-    width: 16px;
-    height: 16px;
-    fill: #212121;
-    /* sort icon rotated 90 degrees for ascending sort (default) */
+.mdtTable .row .sortedColumn ng-md-icon {
+  /* specified 16px is a fix now cause angular materia generates a 24x24 icon even the passed value is 16  */
+  width: 16px;
+  height: 16px;
+  fill: #212121;
+  /* sort icon rotated 90 degrees for ascending sort (default) */
 }
 
-.mdtTable th .sortedColumn ng-md-icon svg {
-    -webkit-transform: rotate(90deg);
-    transform: rotate(90deg);
+.mdtTable .th .sortedColumn ng-md-icon svg {
+  -webkit-transform: rotate(90deg);
+  transform: rotate(90deg);
 }
 
-.mdtTable th .sortedColumn.descending ng-md-icon > svg {
-    -webkit-transform: rotate(-90deg);
-    transform: rotate(-90deg);
+.mdtTable .th .sortedColumn.descending ng-md-icon > svg {
+  -webkit-transform: rotate(-90deg);
+  transform: rotate(-90deg);
 }
 
 .mdtTable thead tr.animate-sort-icon .sortedColumn ng-md-icon svg {
-    -webkit-transition: 0.3s linear all;
-    transition: 0.3s linear all;
+  -webkit-transition: 0.3s linear all;
+  transition: 0.3s linear all;
 }
 
 .mdtTable .mdt-header, .mdtTable .mdt-header-alternate {
-    height: 64px;
-    padding-left: 16px;
-    padding-right: 14px;
+  height: 64px;
+  padding-left: 16px;
+  padding-right: 14px;
 }
 
 .mdtTable .mdt-header md-button, .mdtTable .mdt-header-alternate md-button {
-    margin-left: 16px;
+  margin-left: 16px;
 }
 
 .mdtTable .mdt-header ng-md-icon, .mdtTable .mdt-header-alternate ng-md-icon {
-    fill: #757575;
+  fill: #757575;
 }
 
 .mdtTable .mdt-header-alternate {
-    background-color: #e3edfd;
+  background-color: #e3edfd;
 }
 
 .mdtTable .mdt-header-alternate .alternate-text {
-    color: #0D47A1;
+  color: #0D47A1;
 }
 
-.mdtTable .mdt-footer, .mdtTable tr th {
-    height: 56px;
+.mdtTable .mdt-footer, .mdtTable .tr .th {
+  height: 56px;
 }
 
-.mdtTable .mdt-footer .mdt-pagination, .mdtTable tr th .mdt-pagination {
-    font-size: 12px;
-    color: #757575;
+.mdtTable .mdt-footer .mdt-pagination, .mdtTable .tr .th .mdt-pagination {
+  font-size: 12px;
+  color: #757575;
 }
 
-.mdtTable .mdt-footer .mdt-pagination md-input-container, .mdtTable tr th .mdt-pagination md-input-container {
-    margin-top: 0;
-    margin-bottom: 0;
+.mdtTable .mdt-footer .mdt-pagination md-input-container, .mdtTable .tr .th .mdt-pagination md-input-container {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 .mdtTable .checkboxCell {
-    width: $checkBoxWidth;
-    /*the next cell should not have just 24px padding */
+  width: $checkBoxWidth;
+  /*the next cell should not have just 24px padding */
 }
 
 .mdtTable .checkboxCell md-checkbox {
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
 }
 
-.mdtTable .checkboxCell + td, .mdtTable .checkboxCell + th {
-    padding-left: 16px;
+.mdtTable .checkboxCell + .td, .mdtTable .checkboxCell + .th {
+  padding-left: 16px;
 }
 
 .mdtTable tr td {
-    padding: 0;
-    height: 48px;
-    font-size: 13px;
+  padding: 0;
+  height: 48px;
+  font-size: 13px;
 }
 
-.mdtTable td:first-child, .mdtTable th:first-child {
-    padding: 0 0 0 16px;
+.mdtTable {
+  .td:first-child,
+  .th:first-child {
+    padding-left: 16px;
+  }
 }
 
-.mdtTable td:last-child, .mdtTable th:last-child {
+.mdtTable {
+  .td:last-child,
+  .th:last-child {
     padding-right: 16px;
+  }
 }
 
 .mdtTable .column {
-    padding-left: 56px;
+  padding-left: 56px;
 }
 
 .mdtTable .leftAlignedColumn {
-    text-align: left;
+  text-align: left;
 }
 
 .mdtTable .rightAlignedColumn {
-    text-align: right;
+  text-align: right;
 }
 
-.mdtTable tr th {
-    color: #212121;
-    border-bottom: 0;
-}
-
-.mdtTable tr td {
-    border-bottom: solid 1px #DDDDDD;
+.mdtTable .tr .th {
+  color: #212121;
+  border-bottom: 0;
 }
 
 .mdtTable ng-md-icon {
-    fill: #757575;
+  fill: #757575;
 }
 
 /*context-menu*/
 mtd-dropdown.context-menu {
-    background-color: white;
-    position: fixed;
-    z-index: 51;
-    min-width: 250px;
+  background-color: white;
+  position: fixed;
+  z-index: 51;
+  min-width: 250px;
 }
 
 .mdt-dropdown-menu-item {
-    overflow: hidden;
-    margin: 0;
-    display: block;
-    text-align: left;
-    padding: 5px 10px 5px 20px;
-    text-transform: none;
-    font-size: 14px;
+  overflow: hidden;
+  margin: 0;
+  display: block;
+  text-align: left;
+  padding: 5px 10px 5px 20px;
+  text-transform: none;
+  font-size: 14px;
+  font-weight: normal;
+
+  md-icon {
+    font-size: 20px;
     font-weight: normal;
+  }
 
-    md-icon {
-        font-size: 20px;
-        font-weight: normal;
-    }
-
-    .name {
-        padding-left: 10px;
-    }
+  .name {
+    padding-left: 10px;
+  }
 }
 
