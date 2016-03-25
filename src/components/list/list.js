@@ -138,6 +138,10 @@ function mdListItemDirective($mdAria, $mdConstant, $mdUtil, $timeout) {
         } else {
           container = angular.element('<md-button class="md-no-style"><div class="md-list-item-inner"></div></md-button>');
           copyAttributes(tEl[0], container[0]);
+          if (tEl[0].getAttribute('aria-label')) {
+            container[0].setAttribute('aria-label', tEl[0].getAttribute('aria-label'));
+            tEl[0].removeAttribute('aria-label');
+          }
           container.children().eq(0).append(tEl.contents());
         }
 
