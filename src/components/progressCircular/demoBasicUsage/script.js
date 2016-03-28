@@ -1,3 +1,7 @@
+.controller('AppCtrl', function($scope) {
+    $scope.demo = {
+        placement: "bottom"
+    };
 angular
   .module('progressCircularDemo1', ['ngMaterial'])
   .controller('AppCtrl', ['$scope', '$interval',

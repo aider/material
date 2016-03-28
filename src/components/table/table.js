@@ -87,45 +87,10 @@
                             scope.longPress = false;
                             var self = this;
                             var event = evt;
-                            console.log('touchstart');
                             $timeout(function () {
-                                console.log('touchstart[end:' + scope.touchend + "]");
                                 if (!scope.touchend) {
                                     scope.longPress = true;
                                 }
-
-                                // if (scope.longPress) {
-                                //     // If the touchend event hasn't fired,
-                                //     // apply the function given in on the element's on-long-press attribute
-                                //     // $scope.$apply(function() {
-                                //     //     $scope.$eval($attrs.onLongPress)
-                                //     // });
-                                //
-                                //     var left, top, offset;
-                                //
-                                //     if (scope.onPopup()) {
-                                //         left = event.originalEvent.pageX;
-                                //         top = event.originalEvent.pageY;
-                                //         offset = Util.offset(self);
-                                //
-                                //         if (left + menuListElem[0].clientWidth > offset.left + self.clientWidth) {
-                                //             left -= (left + menuListElem[0].clientWidth) - (offset.left + self.clientWidth);
-                                //         }
-                                //         if (top + menuListElem[0].clientHeight > offset.top + self.clientHeight) {
-                                //             top -= (top + menuListElem[0].clientHeight) - (offset.top + self.clientHeight);
-                                //         }
-                                //
-                                //         scope.contextMenuState.left = (left) + 'px';
-                                //         scope.contextMenuState.top = top + 'px';
-                                //         scope.contextMenuState.visibility = 'visible';
-                                //         scope.contextMenuState.display = 'block';
-                                //         scope.contextMenuState.isVisible = true;
-                                //     }
-                                //
-                                //     scope.$digest();
-                                //     event.stopPropagation();
-                                //
-                                // }
                             }, 600);
                         });
                         elem.bind('touchend', function (event) {
@@ -343,6 +308,7 @@
                 mdtSelectFn: '&',
                 mdtDblclickFn: '&',
                 mdtContextMenuFn: '&',
+                mdtLoading: '=',
                 mdtRow: '=',
                 mdtRowPaginator: '&?',
                 mdtRowPaginatorErrorMessage: "@",
