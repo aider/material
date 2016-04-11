@@ -4,11 +4,12 @@
   color: #323232;
 
   .selectedRow {
-    background-color: '{{accent-color}}';
-    color: #FFFFFF;
+    background-color: #EEEEEE;
+    //'{{accent-color}}';
+    //color: #FFFFFF;
 
     md-icon {
-      color: #FFFFFF !important;
+      //color: #FFFFFF !important;
     }
   }
 }
