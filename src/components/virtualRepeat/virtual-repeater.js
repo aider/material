@@ -76,7 +76,7 @@ var MAX_ELEMENT_SIZE = 1533917;
  * very quickly in Safari, but comes with a higher rendering and dirty-checking cost.
  * @const {number}
  */
-var NUM_EXTRA = 3;
+var NUM_EXTRA = 25;
 
 /** @ngInject */
 function VirtualRepeatContainerController(
