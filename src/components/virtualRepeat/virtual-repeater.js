@@ -93,7 +93,7 @@ function virtualRepeatContainerTemplate($element) {
  * very quickly in Safari, but comes with a higher rendering and dirty-checking cost.
  * @const {number}
  */
-var NUM_EXTRA = 3;
+var NUM_EXTRA = 25;
 
 /** @ngInject */
 function VirtualRepeatContainerController($$rAF, $mdUtil, $mdConstant, $parse, $rootScope, $window,
