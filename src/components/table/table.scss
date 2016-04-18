@@ -379,23 +379,25 @@ mtd-dropdown.context-menu {
 .mdt-dropdown-menu-item {
   overflow: hidden;
   margin: 0;
+  height: 45px;
   display: block;
   text-align: left;
   padding: 5px 10px 5px 20px;
   text-transform: none;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: normal;
 
   md-icon {
     //color: #424242;
-    font-size: 20px;
+    margin: auto 16px auto 0;
+    font-size: 24px;
     font-weight: normal;
   }
 
   .name {
     //color: #424242;
     //font-weight: 600;
-    padding-left: 15px;
+    //padding-left: 15px;
   }
 }
 
