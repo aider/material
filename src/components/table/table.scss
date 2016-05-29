@@ -57,6 +57,11 @@ $checkBoxWidth: 18px;
   .td {
     display: -webkit-flex;
     padding: 0 6px;
+    &:focus {
+      outline: none;
+    }
+
+
   }
   .th {
     display: -webkit-flex;
@@ -186,6 +191,7 @@ $checkBoxWidth: 18px;
       height: 100%;
 
       .td {
+        outline: none;
         padding: 0 6px;
         overflow: hidden;
         position: absolute;
@@ -197,6 +203,9 @@ $checkBoxWidth: 18px;
         max-height: 25px;
         text-overflow: ellipsis;
         white-space: nowrap;
+        &:focus {
+          outline: none;
+        }
       }
       .th {
         overflow: hidden;
