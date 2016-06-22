@@ -11,12 +11,16 @@ $checkBoxWidth: 18px;
   right: 0;
   bottom: 0;
 
+  md-list-item._md-button-wrap > div.md-button:first-child{
+    padding: 0;
+  }
   .row-header {
     //padding: 0 16px;
   }
   .row-header,
   .row-container {
     display: flex;
+
     .td {
       .first-column-section {
         //span {
