@@ -246,9 +246,10 @@ function MdAutocomplete ($$mdSvgRegistry) {
                   ng-blur="$mdAutocompleteCtrl.blur()"\
                   ' + (attr.mdNoAsterisk != null ? 'md-no-asterisk="' + attr.mdNoAsterisk + '"' : '') + '\
                   ng-focus="$mdAutocompleteCtrl.focus($event)"\
+                  ' + (attr.placeholder != null ? 'placeholder="{{placeholder}}"' : '') + '\
                   aria-owns="ul-{{$mdAutocompleteCtrl.id}}"\
                   ' + (attr.mdSelectOnFocus != null ? 'md-select-on-focus=""' : '') + '\
-                  aria-label="{{floatingLabel}}"\
+                  ' + (attr.placeholder != null ? 'aria-label="{{placeholder}}"' : 'aria-label="{{floatingLabel}}"') + '\
                   aria-autocomplete="list"\
                   role="combobox"\
                   aria-haspopup="true"\
