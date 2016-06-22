@@ -75,10 +75,8 @@ angular
  *
  *
  *
- * @param {expression} md-items An expression in the format of `item in results` to iterate over
- *     matches for your search.<br/><br/>
- *     The `results` expression can be also a function, which returns the results synchronously
- *     or asynchronously (per Promise)
+ * @param {expression} md-items An expression in the format of `item in items` to iterate over
+ *     matches for your search.
  * @param {expression=} md-selected-item-change An expression to be run each time a new item is
  *     selected
  * @param {expression=} md-search-text-change An expression to be run each time the search text
@@ -119,15 +117,6 @@ angular
  *     will select on case-insensitive match
  * @param {string=} md-escape-options Override escape key logic. Default is `blur clear`.<br/>
  *     Options: `blur | clear`, `none`
- * @param {string=} md-dropdown-items Specifies the maximum amount of items to be shown in
- *     the dropdown.<br/><br/>
- *     When the dropdown doesn't fit into the viewport, the dropdown will shrink
- *     as less as possible.
- * @param {string=} md-dropdown-position Overrides the default dropdown position. Options: `top`, `bottom`.
- * @param {string=} ng-trim If set to false, the search text will be not trimmed automatically.
- *     Defaults to true.
- * @param {string=} ng-pattern Adds the pattern validator to the ngModel of the search text.
- *     [ngPattern Directive](https://docs.angularjs.org/api/ng/directive/ngPattern)
  *
  * @usage
  * ### Basic Example
@@ -193,34 +182,6 @@ angular
  *
  * In this example, our code utilizes `md-item-template` and `ng-messages` to specify
  *     input validation for the field.
- *
- * ### Asynchronous Results
- * The autocomplete items expression also supports promises, which will resolve with the query results.
- *
- * <hljs lang="js">
- *   function AppController($scope, $http) {
- *     $scope.query = function(searchText) {
- *       return $http
- *         .get(BACKEND_URL + '/items/' + searchText)
- *         .then(function(data) {
- *           // Map the response object to the data object.
- *           return data;
- *         });
- *     };
- *   }
- * </hljs>
- *
- * <hljs lang="html">
- *   <md-autocomplete
- *       md-selected-item="selectedItem"
- *       md-search-text="searchText"
- *       md-items="item in query(searchText)">
- *     <md-item-template>
- *       <span md-highlight-text="searchText">{{item}}</span>
- *     </md-item-template>
- * </md-autocomplete>
- * </hljs>
- *
  */
 
 function MdAutocomplete ($$mdSvgRegistry) {
@@ -364,8 +325,11 @@ function MdAutocomplete ($$mdSvgRegistry) {
                   ng-keydown="$mdAutocompleteCtrl.keydown($event)"\
                   ng-blur="$mdAutocompleteCtrl.blur($event)"\
                   ng-focus="$mdAutocompleteCtrl.focus($event)"\
+                  ' + (attr.placeholder != null ? 'placeholder="{{placeholder}}"' : '') + '\
                   aria-owns="ul-{{$mdAutocompleteCtrl.id}}"\
-                  aria-label="{{floatingLabel}}"\
+                  ' + (attr.mdNoAsterisk != null ? 'md-no-asterisk="' + attr.mdNoAsterisk + '"' : '') + '\
+                  ' + (attr.mdSelectOnFocus != null ? 'md-select-on-focus=""' : '') + '\
+                  ' + (attr.placeholder != null ? 'aria-label="{{placeholder}}"' : 'aria-label="{{floatingLabel}}"') + '\
                   aria-autocomplete="list"\
                   role="combobox"\
                   aria-haspopup="true"\
@@ -392,6 +356,7 @@ function MdAutocomplete ($$mdSvgRegistry) {
                 ng-focus="$mdAutocompleteCtrl.focus($event)"\
                 placeholder="{{placeholder}}"\
                 aria-owns="ul-{{$mdAutocompleteCtrl.id}}"\
+                ' + (attr.mdSelectOnFocus != null ? 'md-select-on-focus=""' : '') + '\
                 aria-label="{{placeholder}}"\
                 aria-autocomplete="list"\
                 role="combobox"\
