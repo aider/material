@@ -6,717 +6,6 @@
 (function(){
     'use strict';
 
-    function mdtAlternateHeadersDirective(){
-        return {
-            restrict: 'E',
-            templateUrl: '/main/templates/mdtAlternateHeaders.html',
-            transclude: true,
-            replace: true,
-            scope: true,
-            require: ['^mdtTable'],
-            link: function($scope){
-                $scope.deleteSelectedRows = deleteSelectedRows;
-
-                function deleteSelectedRows(){
-                    var deletedRows = $scope.tableDataStorageService.deleteSelectedRows();
-
-                    $scope.deleteRowCallback({rows: deletedRows});
-                }
-            }
-        };
-    }
-
-    angular
-        .module('material.components.table')
-        .directive('mdtAlternateHeaders', mdtAlternateHeadersDirective);
-}());
-(function () {
-    'use strict';
-
-    var mdtContextMenuFn = function ($compile, $parse, $timeout, Util) {
-        return {
-            restrict: 'A',
-            scope: {
-                menuList: '=',
-                onPopup: '&',
-                onMenuSelected: '&'
-            },
-            link: function (scope, elem, attrs) {
-                var self = scope;
-
-                scope.onDropdownMenuSelected = function (menuItem, menu) {
-                    scope.onMenuSelected({menuItem: menuItem});
-                };
-
-                scope.$on('$destroy', function () {
-                    self._menuListElem.remove();
-                });
-
-                scope.contextMenuState = {
-                    left: 0,
-                    top: 0,
-                    visibility: 'hidden'
-                };
-
-                var init = function (elem) {
-                    var menuListElem = angular.element('<mtd-dropdown></mtd-dropdown>'),
-                        bodyElem = angular.element(document.body);
-
-                    menuListElem.attr({
-                        'class': 'context-menu',
-                        'menu-list': 'menuList',
-                        'on-menu-selected': 'onDropdownMenuSelected(menuItem)',
-                        'ng-style': 'contextMenuState'
-                    });
-                    $compile(menuListElem)(scope);
-                    bodyElem.append(menuListElem);
-
-
-                    bodyElem.on('click', function (event) {
-                        scope.contextMenuState.display = 'none';
-                        scope.contextMenuState.isVisible = false;
-
-                        scope.$digest();
-                    });
-
-                    var isIOs = /iPhone|iPod|iPad/i.test(navigator.userAgent);
-
-                    if (isIOs) {
-                        elem.bind('touchstart', function (evt) {
-                            scope.touchend = false;
-                            scope.longPress = false;
-                            var self = this;
-                            var event = evt;
-                            $timeout(function () {
-                                if (!scope.touchend) {
-                                    scope.longPress = true;
-                                }
-                            }, 600);
-                        });
-                        elem.bind('touchend', function (event) {
-                            scope.touchend = true;
-                            if (scope.longPress) {
-                                scope.menuVisible = true;
-                                var left, top, offset;
-                                if (scope.onPopup()) {
-                                    left = event.originalEvent.pageX;
-                                    top = event.originalEvent.pageY;
-                                    offset = Util.offset(self);
-
-                                    if (left + menuListElem[0].clientWidth > offset.left + self.clientWidth) {
-                                        left -= (left + menuListElem[0].clientWidth) - (offset.left + self.clientWidth);
-                                    }
-                                    if (top + menuListElem[0].clientHeight > offset.top + self.clientHeight) {
-                                        top -= (top + menuListElem[0].clientHeight) - (offset.top + self.clientHeight);
-                                    }
-
-                                    scope.contextMenuState.left = (left) + 'px';
-                                    scope.contextMenuState.top = top + 'px';
-                                    scope.contextMenuState.visibility = 'visible';
-                                    scope.contextMenuState.display = 'block';
-                                    scope.contextMenuState.isVisible = true;
-                                }
-                                scope.longPress = false;
-                                scope.$digest();
-                                event.preventDefault();
-
-                            }
-                        });
-                    }
-
-                    elem.on('contextmenu', function (event) {
-                        var left, top, offset;
-
-                        if (scope.onPopup()) {
-                            left = event.clientX;
-                            top = event.clientY;
-                            offset = Util.offset(this);
-
-                            if (left + menuListElem[0].clientWidth > offset.left + this.clientWidth) {
-                                left -= (left + menuListElem[0].clientWidth) - (offset.left + this.clientWidth);
-                            }
-                            if (top + menuListElem[0].clientHeight > offset.top + this.clientHeight) {
-                                top -= (top + menuListElem[0].clientHeight) - (offset.top + this.clientHeight);
-                            }
-
-                            scope.contextMenuState.left = left + 'px';
-                            scope.contextMenuState.top = top + 'px';
-                            scope.contextMenuState.visibility = 'visible';
-                            scope.contextMenuState.display = 'block';
-                            scope.contextMenuState.isVisible = true;
-                        }
-
-                        scope.$digest();
-                        event.preventDefault();
-                    });
-
-                    self._elem = elem;
-                    self._menuListElem = menuListElem;
-                };
-
-                init(elem);
-            }
-
-        };
-    };
-    angular
-        .module('material.components.table')
-        .directive('mtdContextMenu', ['$compile', '$parse', '$timeout', 'Util', mdtContextMenuFn]);
-
-})();
-
-(function () {
-    'use strict';
-
-    function onLongPress() {
-        return {
-            restrict: 'A',
-            link: function ($scope, $elm, $attrs) {
-                $elm.bind('touchstart', function (evt) {
-                    // Locally scoped variable that will keep track of the long press
-                    $scope.$apply(function () {
-                        $scope.$eval($attrs.onLongPress)
-                    });
-                });
-
-                // $elm.bind('touchend', function (evt) {
-                //     // Prevent the onLongPress event from firing
-                //     console.log('touchend');
-                //     $scope.longPress = false;
-                //     // If there is an on-touch-end function attached to this element, apply it
-                //     if ($attrs.onTouchEnd) {
-                //         $scope.$apply(function () {
-                //             $scope.$eval($attrs.onTouchEnd)
-                //         });
-                //     }
-                // });
-            }
-        };
-    }
-
-    angular
-        .module('material.components.table')
-        .directive('onLongPress', onLongPress);
-}());
-(function () {
-    'use strict';
-
-    /**
-     * @ngdoc directive
-     * @name mdtTable
-     * @restrict E
-     *
-     * @description
-     * The base HTML tag for the component.
-     *
-     * @param {object=} tableCard when set table will be embedded within a card, with data manipulation tools available
-     *      at the top and bottom.
-     *
-     *      Properties:
-     *
-     *      - `{boolean=}` `visible` - enable/disable table card explicitly
-     *      - `{string}` `title` - the title of the card
-     *      - `{array=}` `actionIcons` - (not implemented yet)
-     *
-     * @param {boolean=} selectableRows when set each row will have a checkbox
-     * @param {String=} alternateHeaders some table cards may require headers with actions instead of titles.
-     *      Two possible approaches to this are to display persistent actions, or a contextual header that activates
-     *      when items are selected
-     *
-     *      Assignable values are:
-     *
-     *      - 'contextual' - when set table will have kind of dynamic header. E.g.: When selecting rows, the header will
-     *        change and it'll show the number of selected rows and a delete icon on the right.
-     *      - 'persistentActions' - (not implemented yet)
-     *
-     * @param {boolean=} sortableColumns sort data and display a sorted state in the header. Clicking on a column which
-     *      is already sorted will reverse the sort order and rotate the sort icon.
-     *      (not implemented yet: Use `sortable-rows-default` attribute directive on a column which intended to be the
-     *      default sortable column)
-     *
-     * @param {function(rows)=} deleteRowCallback callback function when deleting rows.
-     *      At default an array of the deleted row's data will be passed as the argument.
-     *      When `table-row-id` set for the deleted row then that value will be passed.
-     *
-     * @param {boolean=} animateSortIcon sort icon will be animated on change
-     * @param {boolean=} rippleEffect ripple effect will be applied on the columns when clicked (not implemented yet)
-     * @param {boolean=} paginatedRows if set then basic pagination will applied to the bottom of the table.
-     *
-     *      Properties:
-     *
-     *      - `{boolean=}` `isEnabled` - enables pagination
-     *      - `{array}` `rowsPerPageValues` - set page sizes. Example: [5,10,20]
-     *
-     * @param {object=} mdtRow passing rows data through this attribute will initialize the table with data. Additional
-     *      benefit instead of using `mdt-row` element directive is that it makes possible to listen on data changes.
-     *
-     *      Properties:
-     *
-     *      - `{array}` `data` - the input data for rows
-     *      - `{integer|string=}` `table-row-id-key` - the uniq identifier for a row
-     *      - `{array}` `column-keys` - specifying property names for the passed data array. Makes it possible to
-     *        configure which property assigned to which column in the table. The list should provided at the same order
-     *        as it was specified inside `mdt-header-row` element directive.
-     *
-     * @param {function(page, pageSize)=} mdtRowPaginator providing the data for the table by a function. Should set a
-     *      function which returns a promise when it's called. When the function is called, these parameters will be
-     *      passed: `page` and `pageSize` which can help implementing an ajax-based paging.
-     *
-     * @param {string=} mdtRowPaginatorErrorMessage overrides default error message when promise gets rejected by the
-     *      paginator function.
-     *
-     *
-     * @example
-     * <h2>`mdt-row` attribute:</h2>
-     *
-     * When column names are: `Product name`, `Creator`, `Last Update`
-     * The passed data row's structure: `id`, `item_name`, `update_date`, `created_by`
-     *
-     * Then the following setup will parese the data to the right columns:
-     * <pre>
-     *     <mdt-table
-     *         mdt-row="{
-     *             'data': controller.data,
-     *             'table-row-id-key': 'id',
-     *             'column-keys': ['item_name', 'update_date', 'created_by']
-     *         }">
-     *
-     *         <mdt-header-row>
-     *             <mdt-column>Product name</mdt-column>
-     *             <mdt-column>Creator</mdt-column>
-     *             <mdt-column>Last Update</mdt-column>
-     *         </mdt-header-row>
-     *     </mdt-table>
-     * </pre>
-     */
-    function mdtTableDirective(TableDataStorageFactory, mdtPaginationHelperFactory, mdtAjaxPaginationHelperFactory, $timeout) {
-        return {
-            restrict: 'E',
-            templateUrl: '/main/templates/mdtTable.html',
-            transclude: true,
-            replace: true,
-            scope: {
-                tableCard: '=',
-                selectableRows: '=',
-                alternateHeaders: '=',
-                sortableColumns: '=',
-                deleteRowCallback: '&',
-                animateSortIcon: '=',
-                rippleEffect: '=',
-                paginatedRows: '=',
-                mdtModel: '=',
-                mdtSelectFn: '&',
-                mdtTouchFn: '&',
-                mdtDblclickFn: '&',
-                mdtContextMenuFn: '&',
-                mdtRow: '=',
-                mtHideHeader: '=',
-                mdtRowPaginator: '&?',
-                mdtRowPaginatorErrorMessage: "@",
-                mdtEmptyTitle: "=",
-
-                menuList: "=",
-                mdtMenuSelected: "&onMenuSelected",
-                onPopup: "&"
-            },
-            controller: ['$scope', function ($scope) {
-
-                var vm = this;
-                vm.addHeaderCell = addHeaderCell;
-                $scope.remove = function (id) {
-                    console.log($scope.tableDataStorageService.storage);
-                };
-
-                initTableStorageServiceAndBindMethods();
-
-                function initTableStorageServiceAndBindMethods() {
-                    $scope.tableDataStorageService = TableDataStorageFactory.getInstance();
-
-                    if (!$scope.mdtRowPaginator) {
-                        $scope.mdtPaginationHelper = mdtPaginationHelperFactory
-                            .getInstance($scope.tableDataStorageService, $scope.paginatedRows, $scope.mdtRow);
-                    } else {
-                        $scope.mdtPaginationHelper = mdtAjaxPaginationHelperFactory.getInstance({
-                            tableDataStorageService: $scope.tableDataStorageService,
-                            paginationSetting: $scope.paginatedRows,
-                            mdtRowOptions: $scope.mdtRow,
-                            mdtRowPaginatorFunction: $scope.mdtRowPaginator,
-                            mdtRowPaginatorErrorMessage: $scope.mdtRowPaginatorErrorMessage
-                        });
-                    }
-
-                    vm.addRowData = _.bind($scope.tableDataStorageService.addRowData, $scope.tableDataStorageService);
-
-                    $scope.tableDataCnt = 0;
-                    var unbindWatchMdtModel = $scope.$watch('mdtModel', function (data) {
-                        $scope.$watchCollection('mdtModel.data', function (data) {
-                            if (data) {
-                                $timeout(function () {
-                                    $scope.tableIsReady = true;
-                                }, 500);
-                            }
-                            if (data && angular.isArray(data)) {
-                                $scope.tableDataStorageService.initModel($scope.mdtModel, $scope.mdtSelectFn, $scope.mdtTouchFn, $scope.mdtDblclickFn, $scope.mdtContextMenuFn, $scope.onPopup);
-
-                                var rowsLength = $scope.mdtPaginationHelper.getRows().length;
-                                if (rowsLength) {
-                                    $scope.watiForHeight(rowsLength);
-                                }
-                            }
-                        });
-
-                        unbindWatchMdtModel();
-                    });
-                }
-
-
-                function addHeaderCell(ops) {
-                    $scope.tableDataStorageService.addHeaderCellData(ops);
-                }
-
-
-            }],
-            link: function ($scope, element, attrs, ctrl, transclude) {
-                $scope.gridId = $scope.$id;
-                injectContentIntoTemplate();
-                $scope.isSelectable = angular.isDefined(attrs.mdtSelectFn);
-                $scope.isAnyRowSelected = _.bind($scope.tableDataStorageService.isAnyRowSelected, $scope.tableDataStorageService);
-                $scope.isPaginationEnabled = isPaginationEnabled;
-
-                $scope.remove = function (id) {
-                    // console.log($scope.tableDataStorageService.storage);
-                };
-                $scope.onMenuSelected = function (menuItem) {
-                    $scope.mdtMenuSelected({menuItem: menuItem});
-                };
-
-                function getScrollbarWidth() {
-                    var outer = document.createElement("div");
-                    outer.style.visibility = "hidden";
-                    outer.style.width = "100px";
-                    outer.style.msOverflowStyle = "scrollbar"; // needed for WinJS apps
-
-                    document.body.appendChild(outer);
-
-                    var widthNoScroll = outer.offsetWidth;
-                    // force scrollbars
-                    outer.style.overflow = "scroll";
-
-                    // add innerdiv
-                    var inner = document.createElement("div");
-                    inner.style.width = "100%";
-                    outer.appendChild(inner);
-
-                    var widthWithScroll = inner.offsetWidth;
-
-                    // remove divs
-                    outer.parentNode.removeChild(outer);
-
-                    return widthNoScroll - widthWithScroll;
-                }
-
-
-                /*
-                 function watchAnalytics() {
-                 $timeout(function() {
-                 var watchers = ($scope.$$watchers) ? $scope.$$watchers.length : 0;
-                 var child = $scope.$$childHead;
-                 while (child) {
-                 watchers += (child.$$watchers) ? child.$$watchers.length : 0;
-                 child = child.$$nextSibling;
-                 }
-                 console.log('watchers: '+ watchers);
-                 watchAnalytics();
-                 },1000);
-
-                 }
-                 watchAnalytics();
-                 */
-                $scope.hiddenHeadHeight = function () {
-                    return -$('#hiddenHead', element).height() || 0;
-                };
-
-
-                $scope.hiddenBodyHeight = function () {
-                    return -$('#hiddenBody', element).height();
-                };
-
-                $scope.watiForHeight = function (rowsLength) {
-                    $timeout(function () {
-                        $scope.scrollWidth = getScrollbarWidth() || 1;
-                        var $dc = $('.data-container', element);
-
-                        $scope.isScrollVisible = rowsLength * 48 > $dc.height();
-                    });
-
-                    /*
-                     var height = $scope.hiddenHeadHeight();
-                     if (!height && !$scope.tableDataIsReady) {
-                     $timeout(function () {
-                     $scope.watiForHeight();
-                     });
-                     } else {
-                     $('#data-table', element).css('margin-top', height);
-                     $timeout(function () {
-                     var $dc = $('.data-container', element);
-                     $scope.isScrollVisible = $dc.get(0).scrollHeight > $dc.height();
-                     });
-                     $scope.tableIsReady = true;
-                     }
-                     */
-                };
-
-                // $scope.watiForHeight();
-
-                if (!_.isEmpty($scope.mdtRow)) {
-                    //local search/filter
-                    if (angular.isUndefined(attrs.mdtRowPaginator)) {
-                        $scope.$watch('mdtRow', function (mdtRow) {
-                            $scope.tableDataStorageService.storage = [];
-
-                            addRawDataToStorage(mdtRow['data']);
-                        }, true);
-
-
-                    } else {
-                        //if it's used for 'Ajax pagination'
-                    }
-                }
-
-                function addRawDataToStorage(data) {
-                    var rowId;
-                    var columnValues = [];
-                    _.each(data, function (row) {
-                        rowId = _.get(row, $scope.mdtRow['table-row-id-key']);
-                        columnValues = [];
-
-                        _.each($scope.mdtRow['column-keys'], function (columnKey) {
-                            columnValues.push(_.get(row, columnKey));
-                        });
-
-                        $scope.tableDataStorageService.addRowData(rowId, columnValues);
-                    });
-                }
-
-                function isPaginationEnabled() {
-                    if ($scope.paginatedRows === true || ($scope.paginatedRows && $scope.paginatedRows.hasOwnProperty('isEnabled') && $scope.paginatedRows.isEnabled === true)) {
-                        return true;
-                    }
-
-                    return false;
-                }
-
-                function injectContentIntoTemplate() {
-                    transclude(function (clone) {
-                        var headings = [];
-                        var body = [];
-
-                        _.each(clone, function (child) {
-                            var $child = angular.element(child);
-
-                            if ($child.hasClass('theadTrRow')) {
-                                headings.push($child);
-                            } else {
-                                body.push($child);
-                            }
-                        });
-
-                        element.find('#reader').append(headings).append(body);
-                    });
-                }
-
-            }
-        };
-    }
-
-    function mtdDropdown() {
-        return {
-            restrict: 'EA',
-            scope: {
-                menuList: '=',
-                callback: '&onMenuSelected'
-            },
-            templateUrl: '/main/templates/mdtDropdown.html',
-            link: function (scope, elem, attrs, ctrl) {
-                scope.onMenuSelected = function (menuItem) {
-                    scope.callback({menuItem: menuItem});
-                };
-            }
-        };
-    }
-
-
-    // function mdtContextMenu($parse) {
-    //     return {
-    //         restrict: 'A',
-    //         scope: true,
-    //         link: function (scope, element, attrs) {
-    //             var menuHandler = $parse(attrs.mdtContextMenu);
-    //             element.on('contextmenu', function (event) {
-    //                 scope.$apply(function() {
-    //                     menuHandler(scope, {$event: (event)});
-    //                 });
-    //                 return false;
-    //
-    //
-    //             });
-    //         }
-    //     };
-    // }
-    function MtdRightClick($parse, $rootScope) {
-        return {
-            compile: function ($element, attr) {
-                var fn = $parse(attr.mtdRightClick, /* interceptorFn */ null, /* expensiveChecks */ true);
-                return function EventHandler(scope, element) {
-                    element.on('contextmenu', function (event) {
-                        var callback = function () {
-                            fn(scope, {$event: event});
-                        };
-                        if ($rootScope.$$phase) {
-                            scope.$evalAsync(callback);
-                        } else {
-                            scope.$apply(callback);
-                        }
-                    });
-                };
-            }
-        };
-    }
-
-    angular
-        .module('material.components.table')
-        .directive('mdtTable', ['TableDataStorageFactory', 'mdtPaginationHelperFactory', 'mdtAjaxPaginationHelperFactory', '$timeout', mdtTableDirective])
-        .directive('mtdRightClick', ['$parse', '$rootScope', MtdRightClick])
-        .directive('mtdDropdown', mtdDropdown)
-        .filter('ifEmpty', function () {
-            return function (input, defaultValue) {
-                if (angular.isUndefined(input) || input === null || input === '') {
-                    return defaultValue;
-                }
-
-                return input;
-            }
-        })
-        .filter('dateFilter', function ($filter) {
-            return function (input, defaultValue) {
-                if (angular.isUndefined(input) || input === null || input === '') {
-                    return defaultValue;
-                }
-                var inputDate = new Date(input);
-                var dateFilter = $filter('date');
-                var dateFormated = dateFilter(inputDate, 'MMM dd, yyyy');
-                var currentFormated = dateFilter(Date.now(), 'MMM dd, yyyy');
-                
-                if(currentFormated === dateFormated){
-                    dateFormated = dateFilter(inputDate, 'h:mm a');
-                }
-                return dateFormated;
-            }
-        });
-}());
-'use strict';
-
-(function () {
-
-    function mdtTableRow(superCache, $compile, $sce, mdtPaginationHelperFactory) {
-        return {
-            restrict: 'A',
-            scope: {
-                gridId: '=',
-                props: '=',
-                model: '=',
-                onClick: '&'
-            },
-            link: function (scope, element, attrs) {
-
-                scope.trustAsHtml = function (string) {
-                    return $sce.trustAsHtml(string);
-                };
-                var initColumns = function () {
-                    var templateCacheKey = 'row_template' + scope.gridId;
-                    var htmlTemplate = superCache.get(templateCacheKey);
-                    if (!htmlTemplate) {
-                        var rowTemplate = [];
-
-                        var sortedProps = scope.props.filter(function (item) {
-                            return item.enabled;
-                        });
-                        var isOnClickExists = scope.props.some(function (item) {
-                            return !!item.onClick;
-                        });
-                        // superCache.put('sortedProps', sortedProps);
-                        if (!isOnClickExists) {
-                            // rowTemplate.push('<button class="md-no-style md-button md-ink-ripple" type="button" ng-click="onTouch(model)">');
-                            rowTemplate.push('<div class="md-button _md-no-style"><button class="_md-no-style md-button md-ink-ripple" type="button" ng-click="onClick(model)"></button><div class="_md-list-item-inner">');
-                        }
-
-                        sortedProps.forEach(function (prop, index) {
-                            if (prop.enabled) {
-                                var style = '';
-                                Object.keys(prop.style).forEach(function (kstyle) {
-                                    // if(kstyle)
-                                    style += kstyle + ':' + prop.style[kstyle] + ';';
-                                });
-
-
-                                // (prop.onClick ? ' ng-click="props[\'' + index + '\'].onClick(model)"' : '')
-                                // rowTemplate.push('<div class="td ' + prop.class +'" '+  + style = "' + style + '" > ');
-                                rowTemplate.push('<div class="td ' + prop.class + '" ' + (prop.onClick ? ' ng-click="props[\'' + index + '\'].onClick(model)"' : '') + ' style="' + style + '" > ');
-                                rowTemplate.push('<div class="first-column-section">');
-                                if (prop.type === 'html') {
-                                    rowTemplate.push('<span ng-bind-html="trustAsHtml(props[\'' + index + '\'].content(model))"></span>');
-                                } else if (prop.type === 'date') {
-                                    rowTemplate.push('<span>{{(props[\'' + index + '\'].content(model) || model.data[\'' + prop.id + '\']) | dateFilter:\'&#8212\'}}</span>');
-                                } else if (angular.isFunction(prop.content)) {
-                                    rowTemplate.push('<span>{{props[\'' + index + '\'].content(model) | ifEmpty:\'&#8212\'}}</span>');
-                                } else {
-                                    rowTemplate.push('<span>{{model.data[\'' + prop.id + '\'] | ifEmpty:\'&#8212\'}}</span>');
-                                }
-                                rowTemplate.push('</div>');
-
-                                if (prop.secondColumn) {
-                                    rowTemplate.push('<div class="second-column-section ' + prop.secondColumn.class + '">');
-                                    if (prop.type === 'html') {
-                                        rowTemplate.push('<span ng-bind-html="trustAsHtml(props[\'' + index + '\'].secondColumn.content(model))"></span>');
-                                    } else if (prop.type === 'date') {
-                                        rowTemplate.push('<span>{{(props[\'' + index + '\'].secondColumn.content(model) | dateFilter:\'&#8212\'}}</span>');
-                                    } else {
-                                        rowTemplate.push('<span>{{props[\'' + index + '\'].secondColumn.content(model) | ifEmpty:\'&#8212\'}}</span>');
-                                    }
-                                    rowTemplate.push('</div>');
-                                }
-                                rowTemplate.push('</div>');
-                            }
-                        });
-                        if (!isOnClickExists) {
-                            rowTemplate.push('</div>');
-                        }
-
-                        htmlTemplate = rowTemplate.join('');
-                        console.log(htmlTemplate);
-                        superCache.put(templateCacheKey, htmlTemplate);
-                    }
-                    element.html(htmlTemplate);
-                    $compile(element.contents())(scope);
-                };
-
-                // var unbind = scope.$watch('model', function (newData) {
-                //     if (newData) {
-                //         initColumns();
-                //         unbind();
-                //     }
-                // });
-                initColumns();
-            }
-        };
-    }
-
-    angular.module('material.components.table').directive('mdtTableRow', ['superCache', '$compile', '$sce', 'mdtPaginationHelperFactory', mdtTableRow]);
-})();
-
-(function(){
-    'use strict';
-
     function ColumnAlignmentHelper(ColumnOptionProvider){
         var service = this;
         service.getColumnAlignClass = getColumnAlignClass;
@@ -734,6 +23,19 @@
         .module('material.components.table')
         .service('ColumnAlignmentHelper', ['ColumnOptionProvider', ColumnAlignmentHelper]);
 }());
+(function(){
+    'use strict';
+
+    var ColumnOptionProvider = {
+        ALIGN_RULE : {
+            ALIGN_LEFT: 'left',
+            ALIGN_RIGHT: 'right'
+        }
+    };
+
+    angular.module('material.components.table')
+        .value('ColumnOptionProvider', ColumnOptionProvider);
+})();
 (function () {
     'use strict';
 
@@ -1202,16 +504,843 @@
 (function(){
     'use strict';
 
-    var ColumnOptionProvider = {
-        ALIGN_RULE : {
-            ALIGN_LEFT: 'left',
-            ALIGN_RIGHT: 'right'
-        }
-    };
+    function mdtAlternateHeadersDirective(){
+        return {
+            restrict: 'E',
+            templateUrl: '/main/templates/mdtAlternateHeaders.html',
+            transclude: true,
+            replace: true,
+            scope: true,
+            require: ['^mdtTable'],
+            link: function($scope){
+                $scope.deleteSelectedRows = deleteSelectedRows;
 
-    angular.module('material.components.table')
-        .value('ColumnOptionProvider', ColumnOptionProvider);
+                function deleteSelectedRows(){
+                    var deletedRows = $scope.tableDataStorageService.deleteSelectedRows();
+
+                    $scope.deleteRowCallback({rows: deletedRows});
+                }
+            }
+        };
+    }
+
+    angular
+        .module('material.components.table')
+        .directive('mdtAlternateHeaders', mdtAlternateHeadersDirective);
+}());
+(function () {
+    'use strict';
+
+    var mdtContextMenuFn = function ($compile, $parse, $timeout, Util) {
+        return {
+            restrict: 'A',
+            scope: {
+                menuList: '=',
+                onPopup: '&',
+                onMenuSelected: '&'
+            },
+            link: function (scope, elem, attrs) {
+                var self = scope;
+
+                scope.onDropdownMenuSelected = function (menuItem, menu) {
+                    scope.onMenuSelected({menuItem: menuItem});
+                };
+
+                scope.$on('$destroy', function () {
+                    self._menuListElem.remove();
+                });
+
+                scope.contextMenuState = {
+                    left: 0,
+                    top: 0,
+                    visibility: 'hidden'
+                };
+
+                var init = function (elem) {
+                    var menuListElem = angular.element('<mtd-dropdown></mtd-dropdown>'),
+                        bodyElem = angular.element(document.body);
+
+                    menuListElem.attr({
+                        'class': 'context-menu',
+                        'menu-list': 'menuList',
+                        'on-menu-selected': 'onDropdownMenuSelected(menuItem)',
+                        'ng-style': 'contextMenuState'
+                    });
+                    $compile(menuListElem)(scope);
+                    bodyElem.append(menuListElem);
+
+
+                    bodyElem.on('click', function (event) {
+                        scope.contextMenuState.display = 'none';
+                        scope.contextMenuState.isVisible = false;
+
+                        scope.$digest();
+                    });
+
+                    var isIOs = /iPhone|iPod|iPad/i.test(navigator.userAgent);
+
+                    if (isIOs) {
+                        elem.bind('touchstart', function (evt) {
+                            scope.touchend = false;
+                            scope.longPress = false;
+                            var self = this;
+                            var event = evt;
+                            $timeout(function () {
+                                if (!scope.touchend) {
+                                    scope.longPress = true;
+                                }
+                            }, 600);
+                        });
+                        elem.bind('touchend', function (event) {
+                            scope.touchend = true;
+                            if (scope.longPress) {
+                                scope.menuVisible = true;
+                                var left, top, offset;
+                                if (scope.onPopup()) {
+                                    left = event.originalEvent.pageX;
+                                    top = event.originalEvent.pageY;
+                                    offset = Util.offset(this);
+
+                                    if (left + menuListElem[0].clientWidth > offset.left + this.clientWidth) {
+                                        left -= (left + menuListElem[0].clientWidth) - (offset.left + this.clientWidth);
+                                    }
+                                    if (top + menuListElem[0].clientHeight > offset.top + this.clientHeight) {
+                                        top -= menuListElem[0].clientHeight;
+                                        // top -= (top + menuListElem[0].clientHeight) - (offset.top + this.clientHeight);
+                                    }
+
+                                    scope.contextMenuState.left = (left) + 'px';
+                                    scope.contextMenuState.top = top + 'px';
+                                    scope.contextMenuState.visibility = 'visible';
+                                    scope.contextMenuState.display = 'block';
+                                    scope.contextMenuState.isVisible = true;
+                                }
+                                scope.longPress = false;
+                                scope.$digest();
+                                event.preventDefault();
+
+                            }
+                        });
+                    }
+
+                    elem.on('contextmenu', function (event) {
+                        var left, top, offset;
+
+                        if (scope.onPopup()) {
+                            left = event.clientX;
+                            top = event.clientY;
+                            offset = Util.offset(this);
+                            debugger;
+                            if (left + menuListElem[0].clientWidth > offset.left + this.clientWidth) {
+                                left -= (left + menuListElem[0].clientWidth) - (offset.left + this.clientWidth);
+                            }
+                            if (top + menuListElem[0].clientHeight > offset.top + this.clientHeight) {
+                                top -= menuListElem[0].clientHeight;
+                                // top -= (top + menuListElem[0].clientHeight) - (offset.top + this.clientHeight);
+                                // top = top - menuListElem[0].clientHeight + $('md-list-item', this).height()  ;
+                            }
+
+                            scope.contextMenuState.left = left + 'px';
+                            scope.contextMenuState.top = top + 'px';
+                            scope.contextMenuState.visibility = 'visible';
+                            scope.contextMenuState.display = 'block';
+                            scope.contextMenuState.isVisible = true;
+                        }
+
+                        scope.$digest();
+                        event.preventDefault();
+                    });
+
+                    self._elem = elem;
+                    self._menuListElem = menuListElem;
+                };
+
+                init(elem);
+            }
+
+        };
+    };
+    angular
+        .module('material.components.table')
+        .directive('mtdContextMenu', ['$compile', '$parse', '$timeout', 'Util', mdtContextMenuFn]);
+
 })();
+
+(function () {
+    'use strict';
+
+    function onLongPress() {
+        return {
+            restrict: 'A',
+            link: function ($scope, $elm, $attrs) {
+                $elm.bind('touchstart', function (evt) {
+                    // Locally scoped variable that will keep track of the long press
+                    $scope.$apply(function () {
+                        $scope.$eval($attrs.onLongPress)
+                    });
+                });
+
+                // $elm.bind('touchend', function (evt) {
+                //     // Prevent the onLongPress event from firing
+                //     console.log('touchend');
+                //     $scope.longPress = false;
+                //     // If there is an on-touch-end function attached to this element, apply it
+                //     if ($attrs.onTouchEnd) {
+                //         $scope.$apply(function () {
+                //             $scope.$eval($attrs.onTouchEnd)
+                //         });
+                //     }
+                // });
+            }
+        };
+    }
+
+    angular
+        .module('material.components.table')
+        .directive('onLongPress', onLongPress);
+}());
+(function () {
+    'use strict';
+
+    /**
+     * @ngdoc directive
+     * @name mdtTable
+     * @restrict E
+     *
+     * @description
+     * The base HTML tag for the component.
+     *
+     * @param {object=} tableCard when set table will be embedded within a card, with data manipulation tools available
+     *      at the top and bottom.
+     *
+     *      Properties:
+     *
+     *      - `{boolean=}` `visible` - enable/disable table card explicitly
+     *      - `{string}` `title` - the title of the card
+     *      - `{array=}` `actionIcons` - (not implemented yet)
+     *
+     * @param {boolean=} selectableRows when set each row will have a checkbox
+     * @param {String=} alternateHeaders some table cards may require headers with actions instead of titles.
+     *      Two possible approaches to this are to display persistent actions, or a contextual header that activates
+     *      when items are selected
+     *
+     *      Assignable values are:
+     *
+     *      - 'contextual' - when set table will have kind of dynamic header. E.g.: When selecting rows, the header will
+     *        change and it'll show the number of selected rows and a delete icon on the right.
+     *      - 'persistentActions' - (not implemented yet)
+     *
+     * @param {boolean=} sortableColumns sort data and display a sorted state in the header. Clicking on a column which
+     *      is already sorted will reverse the sort order and rotate the sort icon.
+     *      (not implemented yet: Use `sortable-rows-default` attribute directive on a column which intended to be the
+     *      default sortable column)
+     *
+     * @param {function(rows)=} deleteRowCallback callback function when deleting rows.
+     *      At default an array of the deleted row's data will be passed as the argument.
+     *      When `table-row-id` set for the deleted row then that value will be passed.
+     *
+     * @param {boolean=} animateSortIcon sort icon will be animated on change
+     * @param {boolean=} rippleEffect ripple effect will be applied on the columns when clicked (not implemented yet)
+     * @param {boolean=} paginatedRows if set then basic pagination will applied to the bottom of the table.
+     *
+     *      Properties:
+     *
+     *      - `{boolean=}` `isEnabled` - enables pagination
+     *      - `{array}` `rowsPerPageValues` - set page sizes. Example: [5,10,20]
+     *
+     * @param {object=} mdtRow passing rows data through this attribute will initialize the table with data. Additional
+     *      benefit instead of using `mdt-row` element directive is that it makes possible to listen on data changes.
+     *
+     *      Properties:
+     *
+     *      - `{array}` `data` - the input data for rows
+     *      - `{integer|string=}` `table-row-id-key` - the uniq identifier for a row
+     *      - `{array}` `column-keys` - specifying property names for the passed data array. Makes it possible to
+     *        configure which property assigned to which column in the table. The list should provided at the same order
+     *        as it was specified inside `mdt-header-row` element directive.
+     *
+     * @param {function(page, pageSize)=} mdtRowPaginator providing the data for the table by a function. Should set a
+     *      function which returns a promise when it's called. When the function is called, these parameters will be
+     *      passed: `page` and `pageSize` which can help implementing an ajax-based paging.
+     *
+     * @param {string=} mdtRowPaginatorErrorMessage overrides default error message when promise gets rejected by the
+     *      paginator function.
+     *
+     *
+     * @example
+     * <h2>`mdt-row` attribute:</h2>
+     *
+     * When column names are: `Product name`, `Creator`, `Last Update`
+     * The passed data row's structure: `id`, `item_name`, `update_date`, `created_by`
+     *
+     * Then the following setup will parese the data to the right columns:
+     * <pre>
+     *     <mdt-table
+     *         mdt-row="{
+     *             'data': controller.data,
+     *             'table-row-id-key': 'id',
+     *             'column-keys': ['item_name', 'update_date', 'created_by']
+     *         }">
+     *
+     *         <mdt-header-row>
+     *             <mdt-column>Product name</mdt-column>
+     *             <mdt-column>Creator</mdt-column>
+     *             <mdt-column>Last Update</mdt-column>
+     *         </mdt-header-row>
+     *     </mdt-table>
+     * </pre>
+     */
+    function mdtTableDirective(TableDataStorageFactory, mdtPaginationHelperFactory, mdtAjaxPaginationHelperFactory, $timeout) {
+        return {
+            restrict: 'E',
+            templateUrl: '/main/templates/mdtTable.html',
+            transclude: true,
+            replace: true,
+            scope: {
+                tableCard: '=',
+                selectableRows: '=',
+                alternateHeaders: '=',
+                sortableColumns: '=',
+                deleteRowCallback: '&',
+                animateSortIcon: '=',
+                rippleEffect: '=',
+                paginatedRows: '=',
+                mdtModel: '=',
+                mdtSelectFn: '&',
+                mdtTouchFn: '&',
+                mdtDblclickFn: '&',
+                mdtContextMenuFn: '&',
+                mdtRow: '=',
+                mtHideHeader: '=',
+                mdtRowPaginator: '&?',
+                mdtRowPaginatorErrorMessage: "@",
+                mdtEmptyTitle: "=",
+
+                menuList: "=",
+                mdtMenuSelected: "&onMenuSelected",
+                onPopup: "&"
+            },
+            controller: ['$scope', function ($scope) {
+
+                var vm = this;
+                vm.addHeaderCell = addHeaderCell;
+                $scope.remove = function (id) {
+                    // console.log($scope.tableDataStorageService.storage);
+                };
+
+                initTableStorageServiceAndBindMethods();
+
+                function initTableStorageServiceAndBindMethods() {
+                    $scope.tableDataStorageService = TableDataStorageFactory.getInstance();
+
+                    if (!$scope.mdtRowPaginator) {
+                        $scope.mdtPaginationHelper = mdtPaginationHelperFactory
+                            .getInstance($scope.tableDataStorageService, $scope.paginatedRows, $scope.mdtRow);
+                    } else {
+                        $scope.mdtPaginationHelper = mdtAjaxPaginationHelperFactory.getInstance({
+                            tableDataStorageService: $scope.tableDataStorageService,
+                            paginationSetting: $scope.paginatedRows,
+                            mdtRowOptions: $scope.mdtRow,
+                            mdtRowPaginatorFunction: $scope.mdtRowPaginator,
+                            mdtRowPaginatorErrorMessage: $scope.mdtRowPaginatorErrorMessage
+                        });
+                    }
+
+                    vm.addRowData = _.bind($scope.tableDataStorageService.addRowData, $scope.tableDataStorageService);
+
+                    $scope.tableDataCnt = 0;
+                    var unbindWatchMdtModel = $scope.$watch('mdtModel', function (data) {
+                        $scope.$watchCollection('mdtModel.data', function (data) {
+                            if (data) {
+                                $timeout(function () {
+                                    $scope.tableIsReady = true;
+                                }, 500);
+                            }
+                            if (data && angular.isArray(data)) {
+                                $scope.tableDataStorageService.initModel($scope.mdtModel, $scope.mdtSelectFn, $scope.mdtTouchFn, $scope.mdtDblclickFn, $scope.mdtContextMenuFn, $scope.onPopup);
+
+                                var rowsLength = $scope.mdtPaginationHelper.getRows().length;
+                                if (rowsLength) {
+                                    $scope.watiForHeight(rowsLength);
+                                }
+                            }
+                        });
+
+                        unbindWatchMdtModel();
+                    });
+                }
+
+
+                function addHeaderCell(ops) {
+                    $scope.tableDataStorageService.addHeaderCellData(ops);
+                }
+
+
+            }],
+            link: function ($scope, element, attrs, ctrl, transclude) {
+                $scope.gridId = $scope.$id;
+                injectContentIntoTemplate();
+                $scope.isSelectable = angular.isDefined(attrs.mdtSelectFn);
+                $scope.isAnyRowSelected = _.bind($scope.tableDataStorageService.isAnyRowSelected, $scope.tableDataStorageService);
+                $scope.isPaginationEnabled = isPaginationEnabled;
+
+                $scope.remove = function (id) {
+                    // console.log($scope.tableDataStorageService.storage);
+                };
+                $scope.onMenuSelected = function (menuItem) {
+                    $scope.mdtMenuSelected({menuItem: menuItem});
+                };
+
+                function getScrollbarWidth() {
+                    var outer = document.createElement("div");
+                    outer.style.visibility = "hidden";
+                    outer.style.width = "100px";
+                    outer.style.msOverflowStyle = "scrollbar"; // needed for WinJS apps
+
+                    document.body.appendChild(outer);
+
+                    var widthNoScroll = outer.offsetWidth;
+                    // force scrollbars
+                    outer.style.overflow = "scroll";
+
+                    // add innerdiv
+                    var inner = document.createElement("div");
+                    inner.style.width = "100%";
+                    outer.appendChild(inner);
+
+                    var widthWithScroll = inner.offsetWidth;
+
+                    // remove divs
+                    outer.parentNode.removeChild(outer);
+
+                    return widthNoScroll - widthWithScroll;
+                }
+
+
+                /*
+                 function watchAnalytics() {
+                 $timeout(function() {
+                 var watchers = ($scope.$$watchers) ? $scope.$$watchers.length : 0;
+                 var child = $scope.$$childHead;
+                 while (child) {
+                 watchers += (child.$$watchers) ? child.$$watchers.length : 0;
+                 child = child.$$nextSibling;
+                 }
+                 console.log('watchers: '+ watchers);
+                 watchAnalytics();
+                 },1000);
+
+                 }
+                 watchAnalytics();
+                 */
+                $scope.hiddenHeadHeight = function () {
+                    return -$('#hiddenHead', element).height() || 0;
+                };
+
+
+                $scope.hiddenBodyHeight = function () {
+                    return -$('#hiddenBody', element).height();
+                };
+
+                $scope.watiForHeight = function (rowsLength) {
+                    $timeout(function () {
+                        $scope.scrollWidth = getScrollbarWidth() || 1;
+                        var $dc = $('.data-container', element);
+
+                        $scope.isScrollVisible = rowsLength * 48 > $dc.height();
+                    });
+
+                    /*
+                     var height = $scope.hiddenHeadHeight();
+                     if (!height && !$scope.tableDataIsReady) {
+                     $timeout(function () {
+                     $scope.watiForHeight();
+                     });
+                     } else {
+                     $('#data-table', element).css('margin-top', height);
+                     $timeout(function () {
+                     var $dc = $('.data-container', element);
+                     $scope.isScrollVisible = $dc.get(0).scrollHeight > $dc.height();
+                     });
+                     $scope.tableIsReady = true;
+                     }
+                     */
+                };
+
+                // $scope.watiForHeight();
+
+                if (!_.isEmpty($scope.mdtRow)) {
+                    //local search/filter
+                    if (angular.isUndefined(attrs.mdtRowPaginator)) {
+                        $scope.$watch('mdtRow', function (mdtRow) {
+                            $scope.tableDataStorageService.storage = [];
+
+                            addRawDataToStorage(mdtRow['data']);
+                        }, true);
+
+
+                    } else {
+                        //if it's used for 'Ajax pagination'
+                    }
+                }
+
+                function addRawDataToStorage(data) {
+                    var rowId;
+                    var columnValues = [];
+                    _.each(data, function (row) {
+                        rowId = _.get(row, $scope.mdtRow['table-row-id-key']);
+                        columnValues = [];
+
+                        _.each($scope.mdtRow['column-keys'], function (columnKey) {
+                            columnValues.push(_.get(row, columnKey));
+                        });
+
+                        $scope.tableDataStorageService.addRowData(rowId, columnValues);
+                    });
+                }
+
+                function isPaginationEnabled() {
+                    if ($scope.paginatedRows === true || ($scope.paginatedRows && $scope.paginatedRows.hasOwnProperty('isEnabled') && $scope.paginatedRows.isEnabled === true)) {
+                        return true;
+                    }
+
+                    return false;
+                }
+
+                function injectContentIntoTemplate() {
+                    transclude(function (clone) {
+                        var headings = [];
+                        var body = [];
+
+                        _.each(clone, function (child) {
+                            var $child = angular.element(child);
+
+                            if ($child.hasClass('theadTrRow')) {
+                                headings.push($child);
+                            } else {
+                                body.push($child);
+                            }
+                        });
+
+                        element.find('#reader').append(headings).append(body);
+                    });
+                }
+
+            }
+        };
+    }
+
+    function mtdDropdown() {
+        return {
+            restrict: 'EA',
+            scope: {
+                menuList: '=',
+                callback: '&onMenuSelected'
+            },
+            templateUrl: '/main/templates/mdtDropdown.html',
+            link: function (scope, elem, attrs, ctrl) {
+                scope.onMenuSelected = function (menuItem) {
+                    scope.callback({menuItem: menuItem});
+                };
+            }
+        };
+    }
+
+
+    // function mdtContextMenu($parse) {
+    //     return {
+    //         restrict: 'A',
+    //         scope: true,
+    //         link: function (scope, element, attrs) {
+    //             var menuHandler = $parse(attrs.mdtContextMenu);
+    //             element.on('contextmenu', function (event) {
+    //                 scope.$apply(function() {
+    //                     menuHandler(scope, {$event: (event)});
+    //                 });
+    //                 return false;
+    //
+    //
+    //             });
+    //         }
+    //     };
+    // }
+    function MtdRightClick($parse, $rootScope) {
+        return {
+            compile: function ($element, attr) {
+                var fn = $parse(attr.mtdRightClick, /* interceptorFn */ null, /* expensiveChecks */ true);
+                return function EventHandler(scope, element) {
+                    element.on('contextmenu', function (event) {
+                        var callback = function () {
+                            fn(scope, {$event: event});
+                        };
+                        if ($rootScope.$$phase) {
+                            scope.$evalAsync(callback);
+                        } else {
+                            scope.$apply(callback);
+                        }
+                    });
+                };
+            }
+        };
+    }
+
+    angular
+        .module('material.components.table')
+        .directive('mdtTable', ['TableDataStorageFactory', 'mdtPaginationHelperFactory', 'mdtAjaxPaginationHelperFactory', '$timeout', mdtTableDirective])
+        .directive('mtdRightClick', ['$parse', '$rootScope', MtdRightClick])
+        .directive('mtdDropdown', mtdDropdown)
+        .filter('ifEmpty', function () {
+            return function (input, defaultValue) {
+                if (angular.isUndefined(input) || input === null || input === '') {
+                    return defaultValue;
+                }
+
+                return input;
+            }
+        })
+        .filter('dateFilter', function ($filter) {
+            return function (input, defaultValue) {
+                if (angular.isUndefined(input) || input === null || input === '') {
+                    return defaultValue;
+                }
+                var inputDate = new Date(input);
+                var dateFilter = $filter('date');
+                var dateFormated = dateFilter(inputDate, 'MMM dd, yyyy');
+                var currentFormated = dateFilter(Date.now(), 'MMM dd, yyyy');
+                
+                if(currentFormated === dateFormated){
+                    dateFormated = dateFilter(inputDate, 'h:mm a');
+                }
+                return dateFormated;
+            }
+        });
+}());
+'use strict';
+
+(function () {
+
+    function mdtTableRow(superCache, $compile, $sce, mdtPaginationHelperFactory) {
+        return {
+            restrict: 'A',
+            scope: {
+                gridId: '=',
+                props: '=',
+                model: '=',
+                onClick: '&'
+            },
+            link: function (scope, element, attrs) {
+
+                scope.trustAsHtml = function (string) {
+                    return $sce.trustAsHtml(string);
+                };
+                var initColumns = function () {
+                    var templateCacheKey = 'row_template' + scope.gridId;
+                    var htmlTemplate = superCache.get(templateCacheKey);
+                    if (!htmlTemplate) {
+                        var rowTemplate = [];
+
+                        var sortedProps = scope.props.filter(function (item) {
+                            return item.enabled;
+                        });
+                        var isOnClickExists = scope.props.some(function (item) {
+                            return !!item.onClick;
+                        });
+                        // superCache.put('sortedProps', sortedProps);
+                        if (!isOnClickExists) {
+                            // rowTemplate.push('<button class="md-no-style md-button md-ink-ripple" type="button" ng-click="onTouch(model)">');
+                            rowTemplate.push('<div class="md-button _md-no-style"><button class="_md-no-style md-button md-ink-ripple" type="button" ng-click="onClick(model)"></button><div class="_md-list-item-inner">');
+                        }
+
+                        sortedProps.forEach(function (prop, index) {
+                            if (prop.enabled) {
+                                var style = '';
+                                Object.keys(prop.style).forEach(function (kstyle) {
+                                    // if(kstyle)
+                                    style += kstyle + ':' + prop.style[kstyle] + ';';
+                                });
+
+
+                                // (prop.onClick ? ' ng-click="props[\'' + index + '\'].onClick(model)"' : '')
+                                // rowTemplate.push('<div class="td ' + prop.class +'" '+  + style = "' + style + '" > ');
+                                rowTemplate.push('<div class="td ' + prop.class + '" ' + (prop.onClick ? ' ng-click="props[\'' + index + '\'].onClick(model)"' : '') + ' style="' + style + '" > ');
+                                rowTemplate.push('<div class="first-column-section">');
+                                if (prop.type === 'html') {
+                                    rowTemplate.push('<span ng-bind-html="trustAsHtml(props[\'' + index + '\'].content(model))"></span>');
+                                } else if (prop.type === 'date') {
+                                    rowTemplate.push('<span>{{(props[\'' + index + '\'].content(model) || model.data[\'' + prop.id + '\']) | dateFilter:\'&#8212\'}}</span>');
+                                } else if (angular.isFunction(prop.content)) {
+                                    rowTemplate.push('<span>{{props[\'' + index + '\'].content(model) | ifEmpty:\'&#8212\'}}</span>');
+                                } else {
+                                    rowTemplate.push('<span>{{model.data[\'' + prop.id + '\'] | ifEmpty:\'&#8212\'}}</span>');
+                                }
+                                rowTemplate.push('</div>');
+
+                                if (prop.secondColumn) {
+                                    rowTemplate.push('<div class="second-column-section ' + prop.secondColumn.class + '">');
+                                    if (prop.type === 'html') {
+                                        rowTemplate.push('<span ng-bind-html="trustAsHtml(props[\'' + index + '\'].secondColumn.content(model))"></span>');
+                                    } else if (prop.type === 'date') {
+                                        rowTemplate.push('<span>{{(props[\'' + index + '\'].secondColumn.content(model) | dateFilter:\'&#8212\'}}</span>');
+                                    } else {
+                                        rowTemplate.push('<span>{{props[\'' + index + '\'].secondColumn.content(model) | ifEmpty:\'&#8212\'}}</span>');
+                                    }
+                                    rowTemplate.push('</div>');
+                                }
+                                rowTemplate.push('</div>');
+                            }
+                        });
+                        if (!isOnClickExists) {
+                            rowTemplate.push('</div>');
+                        }
+
+                        htmlTemplate = rowTemplate.join('');
+                        superCache.put(templateCacheKey, htmlTemplate);
+                    }
+                    element.html(htmlTemplate);
+                    $compile(element.contents())(scope);
+                };
+
+                // var unbind = scope.$watch('model', function (newData) {
+                //     if (newData) {
+                //         initColumns();
+                //         unbind();
+                //     }
+                // });
+                initColumns();
+            }
+        };
+    }
+
+    angular.module('material.components.table').directive('mdtTableRow', ['superCache', '$compile', '$sce', 'mdtPaginationHelperFactory', mdtTableRow]);
+})();
+
+(function(){
+    'use strict';
+
+    /**
+     * @ngdoc directive
+     * @name mdtColumn
+     * @restrict E
+     * @requires mdtTable
+     *
+     * @description
+     * Representing a header column cell which should be placed inside `mdt-header-row` element directive.
+     *
+     * @param {string=} alignRule align cell content. This settings will have affect on each data cells in the same
+     *  column (e.g. every x.th cell in every row).
+     *
+     *  Assignable values:
+     *    - 'left'
+     *    - 'right'
+     *
+     * @param {function()=} sortBy compareFunction callback for sorting the column data's. As every compare function,
+     *  should get two parameters and return with the comapred result (-1,1,0)
+     *
+     * @param {string=} columnDefinition displays a tooltip on hover.
+     *
+     * @example
+     * <pre>
+     *  <mdt-table>
+     *      <mdt-header-row>
+     *          <mdt-column align-rule="left">Product name</mdt-column>
+     *          <mdt-column
+     *              align-rule="right"
+     *              column-definition="The price of the product in gross.">Price</mdt-column>
+     *      </mdt-header-row>
+     *
+     *      <mdt-row ng-repeat="product in ctrl.products">
+     *          <mdt-cell>{{product.name}}</mdt-cell>
+     *          <mdt-cell>{{product.price}}</mdt-cell>
+     *      </mdt-row>
+     *  </mdt-table>
+     * </pre>
+     */
+    function mdtColumnDirective(){
+        return {
+            restrict: 'E',
+            transclude: true,
+            replace: true,
+            scope: {
+                alignRule: '@',
+                sortBy: '=',
+                columnDefinition: '@'
+            },
+            require: ['^mdtTable'],
+            link: function ($scope, element, attrs, ctrl, transclude) {
+                var mdtTableCtrl = ctrl[0];
+
+                transclude(function (clone) {
+                    mdtTableCtrl.addHeaderCell({
+                        alignRule: $scope.alignRule,
+                        sortBy: $scope.sortBy,
+                        columnDefinition: $scope.columnDefinition,
+                        columnName: clone.html()
+                    });
+                });
+            }
+        };
+    }
+
+    angular
+        .module('material.components.table')
+        .directive('mdtColumn', mdtColumnDirective);
+}());
+(function(){
+    'use strict';
+
+    function mdtGeneratedHeaderCellContentDirective(){
+        return {
+            restrict: 'E',
+            templateUrl: '/main/templates/mdtGeneratedHeaderCellContent.html',
+            replace: true,
+            scope: false,
+            link: function(){
+
+            }
+        };
+    }
+
+    angular
+        .module('material.components.table')
+        .directive('mdtGeneratedHeaderCellContent', mdtGeneratedHeaderCellContentDirective);
+}());
+(function(){
+    'use strict';
+
+    /**
+     * @ngdoc directive
+     * @name mdtHeaderRow
+     * @restrict E
+     * @requires mdtTable
+     *
+     * @description
+     * Representing a header row which should be placed inside `mdt-table` element directive.
+     * The main responsibility of this directive is to execute all the transcluded `mdt-column` element directives.
+     *
+     */
+    function mdtHeaderRowDirective(){
+        return {
+            restrict: 'E',
+            replace: true,
+            transclude: true,
+            require: '^mdtTable',
+            scope: true,
+            link: function($scope, element, attrs, mdtCtrl, transclude){
+                appendColumns();
+
+                function appendColumns(){
+                    transclude(function (clone) {
+                        element.append(clone);
+                    });
+                }
+            }
+        };
+    }
+
+    angular
+        .module('material.components.table')
+        .directive('mdtHeaderRow', mdtHeaderRowDirective);
+}());
 (function () {
     'use strict';
 
@@ -1360,133 +1489,6 @@
     angular
         .module('material.components.table')
         .directive('mdtRow', mdtRowDirective);
-}());
-(function(){
-    'use strict';
-
-    /**
-     * @ngdoc directive
-     * @name mdtColumn
-     * @restrict E
-     * @requires mdtTable
-     *
-     * @description
-     * Representing a header column cell which should be placed inside `mdt-header-row` element directive.
-     *
-     * @param {string=} alignRule align cell content. This settings will have affect on each data cells in the same
-     *  column (e.g. every x.th cell in every row).
-     *
-     *  Assignable values:
-     *    - 'left'
-     *    - 'right'
-     *
-     * @param {function()=} sortBy compareFunction callback for sorting the column data's. As every compare function,
-     *  should get two parameters and return with the comapred result (-1,1,0)
-     *
-     * @param {string=} columnDefinition displays a tooltip on hover.
-     *
-     * @example
-     * <pre>
-     *  <mdt-table>
-     *      <mdt-header-row>
-     *          <mdt-column align-rule="left">Product name</mdt-column>
-     *          <mdt-column
-     *              align-rule="right"
-     *              column-definition="The price of the product in gross.">Price</mdt-column>
-     *      </mdt-header-row>
-     *
-     *      <mdt-row ng-repeat="product in ctrl.products">
-     *          <mdt-cell>{{product.name}}</mdt-cell>
-     *          <mdt-cell>{{product.price}}</mdt-cell>
-     *      </mdt-row>
-     *  </mdt-table>
-     * </pre>
-     */
-    function mdtColumnDirective(){
-        return {
-            restrict: 'E',
-            transclude: true,
-            replace: true,
-            scope: {
-                alignRule: '@',
-                sortBy: '=',
-                columnDefinition: '@'
-            },
-            require: ['^mdtTable'],
-            link: function ($scope, element, attrs, ctrl, transclude) {
-                var mdtTableCtrl = ctrl[0];
-
-                transclude(function (clone) {
-                    mdtTableCtrl.addHeaderCell({
-                        alignRule: $scope.alignRule,
-                        sortBy: $scope.sortBy,
-                        columnDefinition: $scope.columnDefinition,
-                        columnName: clone.html()
-                    });
-                });
-            }
-        };
-    }
-
-    angular
-        .module('material.components.table')
-        .directive('mdtColumn', mdtColumnDirective);
-}());
-(function(){
-    'use strict';
-
-    function mdtGeneratedHeaderCellContentDirective(){
-        return {
-            restrict: 'E',
-            templateUrl: '/main/templates/mdtGeneratedHeaderCellContent.html',
-            replace: true,
-            scope: false,
-            link: function(){
-
-            }
-        };
-    }
-
-    angular
-        .module('material.components.table')
-        .directive('mdtGeneratedHeaderCellContent', mdtGeneratedHeaderCellContentDirective);
-}());
-(function(){
-    'use strict';
-
-    /**
-     * @ngdoc directive
-     * @name mdtHeaderRow
-     * @restrict E
-     * @requires mdtTable
-     *
-     * @description
-     * Representing a header row which should be placed inside `mdt-table` element directive.
-     * The main responsibility of this directive is to execute all the transcluded `mdt-column` element directives.
-     *
-     */
-    function mdtHeaderRowDirective(){
-        return {
-            restrict: 'E',
-            replace: true,
-            transclude: true,
-            require: '^mdtTable',
-            scope: true,
-            link: function($scope, element, attrs, mdtCtrl, transclude){
-                appendColumns();
-
-                function appendColumns(){
-                    transclude(function (clone) {
-                        element.append(clone);
-                    });
-                }
-            }
-        };
-    }
-
-    angular
-        .module('material.components.table')
-        .directive('mdtHeaderRow', mdtHeaderRowDirective);
 }());
 (function(){
     'use strict';
