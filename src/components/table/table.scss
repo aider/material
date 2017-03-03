@@ -163,6 +163,7 @@ $checkBoxWidth: 18px;
     }
 
     th {
+      @extend .noselect;
       font-size: 12px;
       font-weight: 500;
       color: #666666;
