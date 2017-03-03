@@ -102,6 +102,7 @@ function MdNavBar($mdAria, $mdTheming) {
     scope: {
       'mdSelectedNavItem': '=?',
       'navBarAriaLabel': '@?',
+      'mdTabPaddingEnabled': '@?',
     },
     template:
       '<div class="md-nav-bar">' +
@@ -153,6 +154,8 @@ function MdNavBarController($element, $scope, $timeout, $mdConstant) {
   // Data-bound variables.
   /** @type {string} */
   this.mdSelectedNavItem;
+
+  this.mdTabPaddingEnabled;
 
   /** @type {string} */
   this.navBarAriaLabel;
@@ -244,7 +247,15 @@ MdNavBarController.prototype._updateInkBarStyles = function(tab, newIndex, oldIn
     var tabEl = tab.getButtonEl();
     var left = tabEl.offsetLeft;
 
-    this._inkbar.css({left: left + 'px', width: tabEl.offsetWidth + 'px'});
+    var pLeft = 0;
+    var pRight = 0;
+    if (angular.isDefined(this._$scope.ctrl.mdTabPaddingEnabled) && (this._$scope.ctrl.mdTabPaddingEnabled === 'false' || !this._$scope.ctrl.mdTabPaddingEnabled) ) {
+        pLeft = +$(tabEl).css('padding-left').replace('px', '');
+        pRight = +$(tabEl).css('padding-right').replace('px', '');
+    }
+    var padding =  pLeft+ pRight;
+    // this._inkbar.css({left: left + 'px', width: tabEl.offsetWidth + 'px'});
+    this._inkbar.css({left: (left + pLeft) + 'px', width: (tabEl.clientWidth - padding) + 'px'});
   }
 };
 
@@ -413,7 +424,7 @@ function MdNavItem($$rAF) {
       'mdNavClick': '&?',
       'mdNavHref': '@?',
       'mdNavSref': '@?',
-      'name': '@',
+      'name': '@'
     },
     link: function(scope, element, attrs, controllers) {
       var mdNavItem = controllers[0];
