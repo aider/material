@@ -1,4 +1,8 @@
 $checkBoxWidth: 18px;
+.cc-invisible {
+  visibility: hidden !important;
+}
+
 
 #details-body h1.md-toolbar-tools {
   color: #222;
@@ -11,7 +15,7 @@ $checkBoxWidth: 18px;
   right: 0;
   bottom: 0;
 
-  md-list-item.md-button-wrap > div.md-button:first-child{
+  md-list-item.md-button-wrap > div.md-button:first-child {
     padding: 0;
   }
   .row-header {
@@ -64,7 +68,6 @@ $checkBoxWidth: 18px;
     &:focus {
       outline: none;
     }
-
 
   }
   .th {
@@ -361,8 +364,13 @@ $checkBoxWidth: 18px;
 
 .mdtTable {
   .td:last-child,
-  .th:last-child {
+  .th-last {
     padding-right: 16px;
+  }
+
+  .th-scroll {
+    padding-left: 0;
+    padding-right: 0;
   }
 }
 
