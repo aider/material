@@ -40,6 +40,7 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
   ctrl.isRequired = null;
   ctrl.isReadonly = null;
   ctrl.hasNotFound = false;
+  ctrl.selectedMessage = $scope.selectedMessage || 'selected';
 
   // Public Exported Methods
   ctrl.keydown                       = keydown;
@@ -91,6 +92,20 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
       // Forward all focus events to the input element when autofocus is enabled
       if ($scope.autofocus) {
         $element.on('focus', focusInputElement);
+      }
+      if ($scope.inputAriaDescribedBy) {
+        elements.input.setAttribute('aria-describedby', $scope.inputAriaDescribedBy);
+      }
+      if (!$scope.floatingLabel) {
+        if ($scope.inputAriaLabel) {
+          elements.input.setAttribute('aria-label', $scope.inputAriaLabel);
+        } else if ($scope.inputAriaLabelledBy) {
+          elements.input.setAttribute('aria-labelledby', $scope.inputAriaLabelledBy);
+        } else if ($scope.placeholder) {
+          // If no aria-label or aria-labelledby references are defined, then just label using the
+          // placeholder.
+          elements.input.setAttribute('aria-label', $scope.placeholder);
+        }
       }
     });
   }
@@ -321,8 +336,8 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
     if (!hidden && oldHidden) {
       positionDropdown();
 
-      // Report in polite mode, because the screenreader should finish the default description of
-      // the input. element.
+      // Report in polite mode, because the screen reader should finish the default description of
+      // the input element.
       reportMessages(true, ReportType.Count | ReportType.Selected);
 
       if (elements) {
@@ -406,14 +421,17 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
       });
     }
 
-    if (selectedItem !== previousSelectedItem) announceItemChange();
+    if (selectedItem !== previousSelectedItem) {
+      announceItemChange();
+    }
   }
 
   /**
    * Use the user-defined expression to announce changes each time a new item is selected
    */
   function announceItemChange () {
-    angular.isFunction($scope.itemChange) && $scope.itemChange(getItemAsNameVal($scope.selectedItem));
+    angular.isFunction($scope.itemChange) &&
+      $scope.itemChange(getItemAsNameVal($scope.selectedItem));
   }
 
   /**
@@ -430,7 +448,9 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
    * @param previousSelectedItem
    */
   function handleSelectedItemChange (selectedItem, previousSelectedItem) {
-    selectedItemWatchers.forEach(function (watcher) { watcher(selectedItem, previousSelectedItem); });
+    selectedItemWatchers.forEach(function (watcher) {
+      watcher(selectedItem, previousSelectedItem);
+    });
   }
 
   /**
@@ -438,7 +458,7 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
    * @param cb
    */
   function registerSelectedItemWatcher (cb) {
-    if (selectedItemWatchers.indexOf(cb) == -1) {
+    if (selectedItemWatchers.indexOf(cb) === -1) {
       selectedItemWatchers.push(cb);
     }
   }
@@ -449,7 +469,7 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
    */
   function unregisterSelectedItemWatcher (cb) {
     var i = selectedItemWatchers.indexOf(cb);
-    if (i != -1) {
+    if (i !== -1) {
       selectedItemWatchers.splice(i, 1);
     }
   }
@@ -472,16 +492,17 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
       if (searchText !== val) {
         $scope.selectedItem = null;
 
-
         // trigger change event if available
-        if (searchText !== previousSearchText) announceTextChange();
+        if (searchText !== previousSearchText) {
+          announceTextChange();
+        }
 
         // cancel results if search text is not long enough
         if (!isMinLengthMet()) {
           ctrl.matches = [];
 
           setLoading(false);
-          reportMessages(false, ReportType.Count);
+          reportMessages(true, ReportType.Count);
 
         } else {
           handleQuery();
@@ -537,7 +558,7 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
   function keydown (event) {
     switch (event.keyCode) {
       case $mdConstant.KEY_CODE.DOWN_ARROW:
-        if (ctrl.loading) return;
+        if (ctrl.loading || hasSelection()) return;
         event.stopPropagation();
         event.preventDefault();
         ctrl.index   = Math.min(ctrl.index + 1, ctrl.matches.length - 1);
@@ -545,7 +566,7 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
         reportMessages(false, ReportType.Selected);
         break;
       case $mdConstant.KEY_CODE.UP_ARROW:
-        if (ctrl.loading) return;
+        if (ctrl.loading || hasSelection()) return;
         event.stopPropagation();
         event.preventDefault();
         ctrl.index   = ctrl.index < 0 ? ctrl.matches.length - 1 : Math.max(0, ctrl.index - 1);
@@ -617,6 +638,8 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
     /**
      * Getter function to invoke user-defined expression (in the directive)
      * to convert your object to a single string.
+     * @param item
+     * @returns {string|null}
      */
     function getItemText (item) {
       return (item && $scope.itemText) ? $scope.itemText(getItemAsNameVal(item)) : null;
@@ -626,20 +649,24 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
   /**
    * Returns the locals object for compiling item templates.
    * @param item
-   * @returns {{}}
+   * @returns {Object|undefined}
    */
   function getItemAsNameVal (item) {
-    if (!item) return undefined;
+    if (!item) {
+      return undefined;
+    }
 
     var locals = {};
-    if (ctrl.itemName) locals[ ctrl.itemName ] = item;
+    if (ctrl.itemName) {
+      locals[ ctrl.itemName ] = item;
+    }
 
     return locals;
   }
 
   /**
    * Returns the default index based on whether or not autoselect is enabled.
-   * @returns {number}
+   * @returns {number} 0 if autoselect is enabled, -1 if not.
    */
   function getDefaultIndex () {
     return $scope.autoselect ? 0 : -1;
@@ -650,7 +677,7 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
    * @param value {boolean} Whether or not the component is currently loading.
    */
   function setLoading(value) {
-    if (ctrl.loading != value) {
+    if (ctrl.loading !== value) {
       ctrl.loading = value;
     }
 
@@ -686,16 +713,16 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
   }
 
   /**
-   * Determines if the escape keydown should be processed
-   * @returns {boolean}
+   * @returns {boolean} if the escape keydown should be processed, return true.
+   *  Otherwise return false.
    */
   function shouldProcessEscape() {
     return hasEscapeOption('blur') || !ctrl.hidden || ctrl.loading || hasEscapeOption('clear') && $scope.searchText;
   }
 
   /**
-   * Determines if an escape option is set
-   * @returns {boolean}
+   * @param {string} option check if this option is set
+   * @returns {boolean} if the specified escape option is set, return true. Return false otherwise.
    */
   function hasEscapeOption(option) {
     return !$scope.escapeOptions || $scope.escapeOptions.toLowerCase().indexOf(option) !== -1;
@@ -718,32 +745,28 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
   }
 
   /**
-   * Returns true if the search text has matches.
-   * @returns {boolean}
+   * @returns {boolean} true if the search text has matches.
    */
   function hasMatches() {
     return ctrl.matches.length ? true : false;
   }
 
   /**
-   * Returns true if the autocomplete has a valid selection.
-   * @returns {boolean}
+   * @returns {boolean} true if the autocomplete has a valid selection.
    */
   function hasSelection() {
     return ctrl.scope.selectedItem ? true : false;
   }
 
   /**
-   * Returns true if the loading indicator is, or should be, visible.
-   * @returns {boolean}
+   * @returns {boolean} true if the loading indicator is, or should be, visible.
    */
   function loadingIsVisible() {
     return ctrl.loading && !hasSelection();
   }
 
   /**
-   * Returns the display value of the current item.
-   * @returns {*}
+   * @returns {*} the display value of the current item.
    */
   function getCurrentDisplayValue () {
     return getDisplayValue(ctrl.matches[ ctrl.index ]);
@@ -751,7 +774,7 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
 
   /**
    * Determines if the minimum length is met by the search text.
-   * @returns {*}
+   * @returns {*} true if the minimum length is met by the search text
    */
   function isMinLengthMet () {
     return ($scope.searchText || '').length >= getMinLength();
@@ -761,9 +784,9 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
 
   /**
    * Defines a public property with a handler and a default value.
-   * @param key
-   * @param handler
-   * @param value
+   * @param {string} key
+   * @param {Function} handler function
+   * @param {*} value default value
    */
   function defineProperty (key, handler, value) {
     Object.defineProperty(ctrl, key, {
@@ -778,13 +801,14 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
 
   /**
    * Selects the item at the given index.
-   * @param index
+   * @param {number} index to select
    */
   function select (index) {
     //-- force form to update state for validation
     $mdUtil.nextTick(function () {
       getDisplayValue(ctrl.matches[ index ]).then(function (val) {
         var ngModel = elements.$.input.controller('ngModel');
+        $mdLiveAnnouncer.announce(val + ' ' + ctrl.selectedMessage, 'assertive');
         ngModel.$setViewValue(val);
         ngModel.$render();
       }).finally(function () {
@@ -884,12 +908,11 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
 
 
   /**
-   * Reports given message types to supported screenreaders.
+   * Reports given message types to supported screen readers.
    * @param {boolean} isPolite Whether the announcement should be polite.
-   * @param {!number} types Message flags to be reported to the screenreader.
+   * @param {!number} types Message flags to be reported to the screen reader.
    */
   function reportMessages(isPolite, types) {
-
     var politeness = isPolite ? 'polite' : 'assertive';
     var messages = [];
 
@@ -904,12 +927,10 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
     $q.all(messages).then(function(data) {
       $mdLiveAnnouncer.announce(data.join(' '), politeness);
     });
-
   }
 
   /**
-   * Returns the ARIA message for how many results match the current query.
-   * @returns {*}
+   * @returns {string} the ARIA message for how many results match the current query.
    */
   function getCountMessage () {
     switch (ctrl.matches.length) {
@@ -1000,12 +1021,14 @@ function MdAutocompleteCtrl ($scope, $element, $mdUtil, $mdConstant, $mdTheming,
         matches    = ctrl.matches,
         item       = matches[ 0 ];
     if (matches.length === 1) getDisplayValue(item).then(function (displayValue) {
-      var isMatching = searchText == displayValue;
+      var isMatching = searchText === displayValue;
       if ($scope.matchInsensitive && !isMatching) {
-        isMatching = searchText.toLowerCase() == displayValue.toLowerCase();
+        isMatching = searchText.toLowerCase() === displayValue.toLowerCase();
       }
 
-      if (isMatching) select(0);
+      if (isMatching) {
+        select(0);
+      }
     });
   }
 

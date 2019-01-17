@@ -13,8 +13,8 @@ var nextUniqueId = 0;
  * Util
  */
 angular
-  .module('material.core')
-  .factory('$mdUtil', UtilFactory);
+.module('material.core')
+.factory('$mdUtil', UtilFactory);
 
 /**
  * @ngInject
@@ -128,7 +128,7 @@ function UtilFactory($document, $timeout, $compile, $rootScope, $$mdAnimate, $in
       // or a clientRect: a rect relative to the page
       var offsetRect = isOffsetRect ?
         offsetParent.getBoundingClientRect() :
-      {left: 0, top: 0, width: 0, height: 0};
+        {left: 0, top: 0, width: 0, height: 0};
       return {
         left: nodeRect.left - offsetRect.left,
         top: nodeRect.top - offsetRect.top,
@@ -300,13 +300,6 @@ function UtilFactory($document, $timeout, $compile, $rootScope, $$mdAnimate, $in
 
         if (body.clientWidth < clientWidth) {
           body.style.overflow = 'hidden';
-        }
-
-        // This should be applied after the manipulation to the body, because
-        // adding a scrollbar can potentially resize it, causing the measurement
-        // to change.
-        if (hasVerticalScrollbar) {
-          documentElement.style.overflowY = 'scroll';
         }
 
         return function restoreScroll() {
@@ -655,8 +648,10 @@ function UtilFactory($document, $timeout, $compile, $rootScope, $$mdAnimate, $in
      * nextTick() coalesces all calls within a single frame
      * to minimize $digest thrashing
      *
-     * @param callback
-     * @param digest
+     * @param {Function} callback function to be called after the tick
+     * @param {boolean} digest true to call $rootScope.$digest() after callback
+     * @param scope scope associated with callback. If the scope is destroyed, the callback will
+     *  be skipped.
      * @returns {*}
      */
     nextTick: function(callback, digest, scope) {
@@ -705,7 +700,7 @@ function UtilFactory($document, $timeout, $compile, $rootScope, $$mdAnimate, $in
 
     /**
      * Processes a template and replaces the start/end symbols if the application has
-     * overriden them.
+     * overridden them.
      *
      * @param template The template to process whose start/end tags may be replaced.
      * @returns {*}
@@ -862,6 +857,19 @@ function UtilFactory($document, $timeout, $compile, $rootScope, $$mdAnimate, $in
       return array.filter(function(value, index, self) {
         return self.indexOf(value) === index;
       });
+    },
+
+    /**
+     * Function to get innerHTML of SVG and Symbol elements in IE11
+     * @param {Element} element
+     * @returns {string} the innerHTML of the element passed in
+     */
+    getInnerHTML: function(element) {
+      var serializer = new XMLSerializer();
+
+      return Array.prototype.map.call(element.childNodes, function (child) {
+        return serializer.serializeToString(child);
+      }).join('');
     }
   };
 
@@ -884,14 +892,14 @@ function UtilFactory($document, $timeout, $compile, $rootScope, $$mdAnimate, $in
  */
 
 angular.element.prototype.focus = angular.element.prototype.focus || function() {
-    if (this.length) {
-      this[0].focus();
-    }
-    return this;
-  };
+  if (this.length) {
+    this[0].focus();
+  }
+  return this;
+};
 angular.element.prototype.blur = angular.element.prototype.blur || function() {
-    if (this.length) {
-      this[0].blur();
-    }
-    return this;
-  };
+  if (this.length) {
+    this[0].blur();
+  }
+  return this;
+};

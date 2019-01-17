@@ -362,6 +362,10 @@ function InterimElementProvider() {
 
         function closeElement(interim) {
 
+          if (!interim) {
+            return $q.when(reason);
+          }
+
           var hideAction = interim
             .remove(reason, false, options || { })
             .catch(function(reason) { return reason; })

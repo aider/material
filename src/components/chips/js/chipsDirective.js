@@ -133,15 +133,38 @@
    * @param {expression=} md-on-remove An expression which will be called when a chip has been
    *    removed with `$chip`, `$index`, and `$event` available as parameters.
    * @param {expression=} md-on-select An expression which will be called when a chip is selected.
-   * @param {boolean} md-require-match If true, and the chips template contains an autocomplete,
+   * @param {boolean=} md-require-match If true, and the chips template contains an autocomplete,
    *    only allow selection of pre-defined chips (i.e. you cannot add new ones).
+   * @param {string=} input-aria-describedby A space-separated list of element IDs. This should
+   *     contain the IDs of any elements that describe this autocomplete. Screen readers will read
+   *     the content of these elements at the end of announcing that the chips input has been
+   *     selected and describing its current state. The descriptive elements do not need to be
+   *     visible on the page.
+   * @param {string=} input-aria-labelledby A space-separated list of element IDs. The ideal use
+   *    case is that this would contain the ID of a `<label>` element that is associated with these
+   *    chips.<br><br>
+   *    For `<label id="state">US State</label>`, you would set this to
+   *    `input-aria-labelledby="state"`.
    * @param {string=} input-aria-label A string read by screen readers to identify the input.
+   *    For static chips, this will be applied to the chips container.
    * @param {string=} container-hint A string read by screen readers informing users of how to
-   *    navigate the chips. Used in readonly mode.
+   *    navigate the chips when there are chips. Only applies when `ng-model` is defined.
+   * @param {string=} container-empty-hint A string read by screen readers informing users of how to
+   *    add chips when there are no chips. You will want to use this to override the default when
+   *    in a non-English locale. Only applies when `ng-model` is defined.
    * @param {string=} delete-hint A string read by screen readers instructing users that pressing
-   *    the delete key will remove the chip.
-   * @param {string=} delete-button-label A label for the delete button. Also hidden and read by
-   *    screen readers.
+   *    the delete key will remove the chip. You will want to use this to override the default when
+   *    in a non-English locale.
+   * @param {string=} delete-button-label <strong>Deprecated</strong> A label for the delete button.
+   *    Used to be read by screen readers.
+   * @param {string=} md-removed-message Screen readers will announce this message following the
+   *    chips contents. The default is `"removed"`. If a chip with the content of "Apple" was
+   *    removed, the screen reader would read "Apple removed". You will want to use this to override
+   *    the default when in a non-English locale.
+   * @param {string=} md-added-message Screen readers will announce this message following the
+   *    chips contents. The default is `"added"`. If a chip with the content of "Apple" was
+   *    created, the screen reader would read "Apple added". You will want to use this to override
+   *    the default when in a non-English locale.
    * @param {expression=} md-separator-keys An array of key codes used to separate chips.
    * @param {string=} md-chip-append-delay The number of milliseconds that the component will select
    *    a newly appended chip before allowing a user to type into the input. This is **necessary**
@@ -186,6 +209,8 @@
    *
    */
 
+  // TODO add a way for developers to specify which field of the object should used in the
+  // aria-label.
   var MD_CHIPS_TEMPLATE = '\
       <md-chips-wrap\
           id="{{$mdChipsCtrl.wrapperId}}"\
@@ -194,21 +219,19 @@
           ng-class="{ \'md-focused\': $mdChipsCtrl.hasFocus(), \
                       \'md-readonly\': !$mdChipsCtrl.ngModelCtrl || $mdChipsCtrl.readonly,\
                       \'md-removable\': $mdChipsCtrl.isRemovable() }"\
-          aria-setsize="{{$mdChipsCtrl.items.length}}"\
           class="md-chips">\
-        <span ng-if="$mdChipsCtrl.readonly" class="md-visually-hidden">\
-          {{$mdChipsCtrl.containerHint}}\
-        </span>\
         <md-chip ng-repeat="$chip in $mdChipsCtrl.items"\
-            index="{{$index}}"\
+            index="{{$index}}" \
             ng-class="{\'md-focused\': $mdChipsCtrl.selectedChip == $index, \'md-readonly\': !$mdChipsCtrl.ngModelCtrl || $mdChipsCtrl.readonly}">\
           <div class="md-chip-content"\
-              tabindex="{{$mdChipsCtrl.ariaTabIndex == $index ? 0 : -1}}"\
+              tabindex="{{$mdChipsCtrl.ariaTabIndex === $index ? 0 : -1}}"\
               id="{{$mdChipsCtrl.contentIdFor($index)}}"\
               role="option"\
               aria-selected="{{$mdChipsCtrl.selectedChip === $index}}"\
-              aria-posinset="{{$index}}"\
+              aria-setsize="{{$mdChipsCtrl.items.length}}"\
+              aria-posinset="{{$index+1}}"\
               ng-click="!$mdChipsCtrl.readonly && $mdChipsCtrl.focusChip($index)"\
+              aria-label="{{$mdChipsCtrl._isChipObject($chip) ? \'\' : $chip + \'. \'}}{{$mdChipsCtrl.isRemovable() ? \'\' + $mdChipsCtrl.deleteHint : \'\'}}" \
               ng-focus="!$mdChipsCtrl.readonly && $mdChipsCtrl.selectChip($index)"\
               md-chip-transclude="$mdChipsCtrl.chipContentsTemplate"></div>\
           <div ng-if="$mdChipsCtrl.isRemovable()"\
@@ -225,7 +248,7 @@
         <input\
             class="md-input"\
             tabindex="0"\
-            aria-label="{{$mdChipsCtrl.inputAriaLabel}}" \
+            aria-label="{{$mdChipsCtrl.inputAriaLabel}}"\
             placeholder="{{$mdChipsCtrl.getPlaceholder()}}"\
             ng-model="$mdChipsCtrl.chipBuffer"\
             ng-focus="$mdChipsCtrl.onInputFocus()"\
@@ -241,11 +264,9 @@
           ng-if="$mdChipsCtrl.isRemovable()"\
           ng-click="$mdChipsCtrl.removeChipAndFocusInput($$replacedScope.$index, $event)"\
           type="button"\
-          tabindex="-1">\
-        <md-icon md-svg-src="{{ $mdChipsCtrl.mdCloseIcon }}"></md-icon>\
-        <span class="md-visually-hidden">\
-          {{$mdChipsCtrl.deleteButtonLabel}}\
-        </span>\
+          tabindex="-1"\
+          aria-label="{{$mdChipsCtrl.deleteButtonLabel}}{{$mdChipsCtrl._isChipObject($chip) ? \'\' : \' \' + $chip}}">\
+        <md-icon md-svg-src="{{$mdChipsCtrl.mdCloseIcon}}" aria-hidden="true"></md-icon>\
       </button>';
 
   /**
@@ -271,24 +292,29 @@
       bindToController: true,
       compile: compile,
       scope: {
-        readonly: '=readonly',
-        removable: '=mdRemovable',
-        placeholder: '@',
-        secondaryPlaceholder: '@',
-        maxChips: '@mdMaxChips',
+        readonly: '=?readonly',
+        removable: '=?mdRemovable',
+        placeholder: '@?',
+        secondaryPlaceholder: '@?',
+        maxChips: '@?mdMaxChips',
         transformChip: '&mdTransformChip',
-        onAppend: '&mdOnAppend',
-        onAdd: '&mdOnAdd',
-        onRemove: '&mdOnRemove',
-        onSelect: '&mdOnSelect',
-        inputAriaLabel: '@',
-        containerHint: '@',
-        deleteHint: '@',
-        deleteButtonLabel: '@',
+        onAppend: '&?mdOnAppend',
+        onAdd: '&?mdOnAdd',
+        onRemove: '&?mdOnRemove',
+        addedMessage: '@?mdAddedMessage',
+        removedMessage: '@?mdRemovedMessage',
+        onSelect: '&?mdOnSelect',
+        inputAriaDescribedBy: '@?inputAriaDescribedby',
+        inputAriaLabelledBy: '@?inputAriaLabelledby',
+        inputAriaLabel: '@?',
+        containerHint: '@?',
+        containerEmptyHint: '@?',
+        deleteHint: '@?',
+        deleteButtonLabel: '@?',
         separatorKeys: '=?mdSeparatorKeys',
         requireMatch: '=?mdRequireMatch',
         chipAppendDelayString: '@?mdChipAppendDelay',
-        ngChange: '&'
+        ngChange: '&?'
       }
     };
 
@@ -412,7 +438,7 @@
           // The md-autocomplete and input elements won't be compiled until after this directive
           // is complete (due to their nested nature). Wait a tick before looking for them to
           // configure the controller.
-          if (chipInputTemplate != templates.input) {
+          if (chipInputTemplate !== templates.input) {
             // The autocomplete will not appear until the readonly attribute is not true (i.e.
             // false or undefined), so we have to watch the readonly and then on the next tick
             // after the chip transclusion has run, we can configure the autocomplete and user

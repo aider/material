@@ -1,13 +1,23 @@
-# Material Design for AngularJS Apps [![Build Status](https://travis-ci.org/angular/material.svg)](https://travis-ci.org/angular/material)
+# Material Design for AngularJS Apps
+[![npm version](https://badge.fury.io/js/angular-material.svg)](https://www.npmjs.com/package/angular-material)
+[![Build Status](https://travis-ci.org/angular/material.svg)](https://travis-ci.org/angular/material)
+[![Gitter](https://badges.gitter.im/angular/material2.svg)](https://gitter.im/angular/material?utm_source=badge&utm_medium=badge)
 
-[Material Design](https://material.io/) is a specification for a
+[Material Design](https://material.io/archive/guidelines/) is a specification for a
 unified system of visual, motion, and interaction design that adapts across different devices. Our
 goal is to deliver a lean, lightweight set of AngularJS-native UI elements that implement the
 material design specification for use in AngularJS single-page applications (SPAs).
 
+**AngularJS Material** is an implementation of Google's 
+[Material Design Specification (2014-2017)](https://material.io/archive/guidelines/material-design/)
+for [AngularJS](https://angularjs.org) developers.
+
+For an implementation of the [Material Design Specification (2018+)](https://material.io/design/),
+please see the [Angular Material](https://github.com/angular/material2) project which is built for
+[Angular](https://angular.io) developers.
+
 ![venn diagram](https://cloud.githubusercontent.com/assets/210413/5077572/30dfc2f0-6e6a-11e4-9723-07c918128f4f.png)
 
-AngularJS Material is an implementation of Google's [Material Design Specification](https://material.io/guidelines/material-design/).
 AngularJS Material includes a rich set of reusable, well-tested, and accessible UI components.
 
 Quick Links:
@@ -18,10 +28,15 @@ Quick Links:
 *  [Installing](#installing)
 
 
-Please note that using AngularJS Material requires the use of **[AngularJS](https://angularjs.org/) 1.4.x** or higher.
-AngularJS Material is targeted for the browser versions shown below in the green boxes:
+Please note that using AngularJS Material requires the use of **[AngularJS](https://angularjs.org/)
+1.4.x** or higher.
 
-![ngm1_browser_support](https://user-images.githubusercontent.com/3506071/35176284-1419c42c-fd46-11e7-9381-d93e5c5db39a.png)
+AngularJS Material is targeted for the browser versions defined in the `browserslist` field
+of our [package.json](package.json). Below is a screenshot from 
+[browserl.ist](http://browserl.ist/?q=%3E+0.5%25%2C+last+2+versions%2C+Firefox+ESR%2C+not+ie+%3C%3D+10%2C+not+ie_mob+%3C%3D+10%2C+not+bb+%3C%3D+10%2C+not+op_mob+%3C%3D+12.1)
+that provides a visual representation of this configuration:
+
+![AngularJS Material Browser Support](https://user-images.githubusercontent.com/3506071/50240047-c7e00780-0391-11e9-9241-6674a412ce94.png)
 
 ## <a name="demos"></a> Online Documentation and Demos
 
@@ -48,9 +63,9 @@ We have three types of releases:
 
 ##### Patch Releases
 
-The patch builds (1.1.4, 1.1.5, 1.1.6) are prepared based on commits in the `master` branch; which contains only
-non-breaking changes (I.e. bug fixes, new features, API additions, and minimal non-breaking CSS changes). 
-We are targeting `patch` releases every 2 weeks.
+The patch builds (1.1.8, 1.1.9, 1.1.10, etc.) are prepared based on commits in the `master` branch;
+which contains only non-breaking changes (I.e. bug fixes, new features, API additions, and minimal
+non-breaking CSS changes). We are targeting `patch` releases every 2 weeks.
 
 ##### Minor Releases
 
@@ -145,7 +160,7 @@ CDN versions of AngularJS Material are now available.
 
 With the Google CDN, you will not need to download local copies of the distribution files. Instead
 simply reference the CDN urls to easily use those remote library files. This is especially useful
-when using online tools such as [CodePen](http://codepen.io/), [Plunkr](http://plnkr.co/), or
+when using online tools such as [CodePen](http://codepen.io/), [Plunker](http://plnkr.co/), or
 [JSFiddle](http://jsfiddle.net/).
 
 ```html
@@ -158,13 +173,13 @@ when using online tools such as [CodePen](http://codepen.io/), [Plunkr](http://p
   <body>
 
     <!-- AngularJS Material Dependencies -->
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.7/angular.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.7/angular-animate.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.7/angular-aria.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.7/angular-messages.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.4/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.4/angular-animate.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.4/angular-aria.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.4/angular-messages.min.js"></script>
 
-    <!-- AngularJS Material Javascript now available via Google CDN; version 1.1.4 used here -->
-    <script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.9/angular-material.min.js"></script>
+    <!-- AngularJS Material Javascript now available via Google CDN; version 1.1.10 used here -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.10/angular-material.min.js"></script>
   </body>
 ```
 
@@ -182,10 +197,10 @@ pull directly from the distribution GitHub
   <body>
 
     <!-- AngularJS Material Dependencies -->
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-animate.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-aria.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-messages.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.4/angular.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.4/angular-animate.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.4/angular-aria.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.4/angular-messages.min.js"></script>
 
     <!-- AngularJS Material Javascript using GitCDN to load directly from `bower-material/master` -->
     <script src="https://cdn.gitcdn.link/cdn/angular/bower-material/master/angular-material.js"></script>
@@ -198,4 +213,3 @@ Once you have all the necessary assets installed, add `ngMaterial` and `ngMessag
 ```javascript
 angular.module('myApp', ['ngMaterial', 'ngMessages']);
 ```
-

@@ -19,7 +19,8 @@ angular
  *     no matches were found.  You can do this by wrapping your template in `md-item-template` and
  *     adding a tag for `md-not-found`.  An example of this is shown below.
  *
- * To reset the displayed value you must clear both values for `md-search-text` and `md-selected-item`.
+ * To reset the displayed value you must clear both values for `md-search-text` and
+ * `md-selected-item`.
  *
  * ### Validation
  *
@@ -96,11 +97,14 @@ angular
  *     make suggestions.
  * @param {number=} md-delay Specifies the amount of time (in milliseconds) to wait before looking
  *     for results.
- * @param {boolean=} md-clear-button Whether the clear button for the autocomplete input should show up or not.
- * @param {boolean=} md-autofocus If true, the autocomplete will be automatically focused when a `$mdDialog`,
- *     `$mdBottomsheet` or `$mdSidenav`, which contains the autocomplete, is opening. <br/><br/>
+ * @param {boolean=} md-clear-button Whether the clear button for the autocomplete input should show
+ *     up or not.
+ * @param {boolean=} md-autofocus If true, the autocomplete will be automatically focused when a
+ *     `$mdDialog`, `$mdBottomsheet` or `$mdSidenav`, which contains the autocomplete, is opening.
+ *     <br/><br/>
  *     Also the autocomplete will immediately focus the input element.
- * @param {boolean=} md-no-asterisk When present, asterisk will not be appended to the floating label.
+ * @param {boolean=} md-no-asterisk When present, asterisk will not be appended to the floating
+ *     label.
  * @param {boolean=} md-autoselect If set to true, the first item will be automatically selected
  *     in the dropdown upon open.
  * @param {string=} md-input-name The name attribute given to the input element to be used with
@@ -111,7 +115,7 @@ angular
  * @param {string=} md-input-class This will be applied to the input for styling. This attribute
  *     is only valid when a `md-floating-label` is defined.
  * @param {string=} md-floating-label This will add a floating label to autocomplete and wrap it in
- *     `md-input-container`
+ *     `md-input-container`.
  * @param {string=} md-select-on-focus When present the inputs text will be automatically selected
  *     on focus.
  * @param {string=} md-input-id An ID to be added to the input element.
@@ -128,7 +132,26 @@ angular
  *     the dropdown.<br/><br/>
  *     When the dropdown doesn't fit into the viewport, the dropdown will shrink
  *     as much as possible.
- * @param {string=} md-dropdown-position Overrides the default dropdown position. Options: `top`, `bottom`.
+ * @param {string=} md-dropdown-position Overrides the default dropdown position. Options: `top`,
+ *    `bottom`.
+ * @param {string=} input-aria-describedby A space-separated list of element IDs. This should
+ *     contain the IDs of any elements that describe this autocomplete. Screen readers will read the
+ *     content of these elements at the end of announcing that the autocomplete has been selected
+ *     and describing its current state. The descriptive elements do not need to be visible on the
+ *     page.
+ * @param {string=} input-aria-labelledby A space-separated list of element IDs. The ideal use case
+ *     is that this would contain the ID of a `<label>` element that is associated with this
+ *     autocomplete. This will only have affect when `md-floating-label` is not defined.<br><br>
+ *     For `<label id="state">US State</label>`, you would set this to
+ *     `input-aria-labelledby="state"`.
+ * @param {string=} input-aria-label A label that will be applied to the autocomplete's input.
+ *    This will be announced by screen readers before the placeholder.
+ *    This will only have affect when `md-floating-label` is not defined. If you define both
+ *    `input-aria-label` and `input-aria-labelledby`, then `input-aria-label` will take precedence.
+ * @param {string=} md-selected-message Attribute to specify the text that the screen reader will
+ *    announce after a value is selected. Default is: "selected". If `Alaska` is selected in the
+ *    options panel, it will read "Alaska selected". You will want to override this when your app
+ *    is running in a non-English locale.
  * @param {boolean=} ng-trim If set to false, the search text will be not trimmed automatically.
  *     Defaults to true.
  * @param {string=} ng-pattern Adds the pattern validator to the ngModel of the search text.
@@ -168,13 +191,13 @@ angular
  *
  * ### Clear button for the input
  * By default, the clear button is displayed when there is input. This aligns with the spec's
- * [Search Pattern](https://material.io/guidelines/patterns/search.html#search-in-app-search).
- * In floating label mode, when `md-floating-label="My Label"` is applied, the clear button is not displayed
- * by default (see the spec's
- * [Autocomplete Text Field](https://material.io/guidelines/components/text-fields.html#text-fields-layout)).
+ * [Search Pattern](https://material.io/archive/guidelines/patterns/search.html#search-in-app-search).
+ * In floating label mode, when `md-floating-label="My Label"` is applied, the clear button is not
+ * displayed by default (see the spec's
+ * [Autocomplete Text Field](https://material.io/archive/guidelines/components/text-fields.html#text-fields-layout)).
  *
- * Nevertheless, developers are able to explicitly toggle the clear button for all autocomplete components
- * with `md-clear-button`.
+ * Nevertheless, developers are able to explicitly toggle the clear button for all autocomplete
+ * components with `md-clear-button`.
  *
  * <hljs lang="html">
  *   <md-autocomplete ... md-clear-button="true"></md-autocomplete>
@@ -211,6 +234,35 @@ angular
  *
  * In this example, our code utilizes `md-item-template` and `ng-messages` to specify
  *     input validation for the field.
+ *
+ * ### Asynchronous Results
+ * The autocomplete items expression also supports promises, which will resolve with the query
+ * results.
+ *
+ * <hljs lang="js">
+ *   function AppController($scope, $http) {
+ *     $scope.query = function(searchText) {
+ *       return $http
+ *         .get(BACKEND_URL + '/items/' + searchText)
+ *         .then(function(data) {
+ *           // Map the response object to the data object.
+ *           return data;
+ *         });
+ *     };
+ *   }
+ * </hljs>
+ *
+ * <hljs lang="html">
+ *   <md-autocomplete
+ *       md-selected-item="selectedItem"
+ *       md-search-text="searchText"
+ *       md-items="item in query(searchText)">
+ *     <md-item-template>
+ *       <span md-highlight-text="searchText">{{item}}</span>
+ *     </md-item-template>
+ * </md-autocomplete>
+ * </hljs>
+ *
  */
 function MdAutocomplete ($$mdSvgRegistry) {
 
@@ -226,6 +278,9 @@ function MdAutocomplete ($$mdSvgRegistry) {
       itemsExpr:          '@mdItems',
       itemText:           '&mdItemText',
       placeholder:        '@placeholder',
+      inputAriaDescribedBy: '@?inputAriaDescribedby',
+      inputAriaLabelledBy: '@?inputAriaLabelledby',
+      inputAriaLabel:     '@?inputAriaLabel',
       noCache:            '=?mdNoCache',
       requireMatch:       '=?mdRequireMatch',
       selectOnMatch:      '=?mdSelectOnMatch',
@@ -244,7 +299,8 @@ function MdAutocomplete ($$mdSvgRegistry) {
       escapeOptions:      '@?mdEscapeOptions',
       dropdownItems:      '=?mdDropdownItems',
       dropdownPosition:   '@?mdDropdownPosition',
-      clearButton:        '=?mdClearButton'
+      clearButton:        '=?mdClearButton',
+      selectedMessage:    '@?mdSelectedMessage'
     },
     compile: function(tElement, tAttrs) {
       var attributes = ['md-select-on-focus', 'md-no-asterisk', 'ng-trim', 'ng-pattern'];
@@ -263,8 +319,8 @@ function MdAutocomplete ($$mdSvgRegistry) {
         // be added to the element in the template function.
         ctrl.hasNotFound = !!element.attr('md-has-not-found');
 
-        // By default the inset autocomplete should show the clear button when not explicitly overwritten
-        // or in floating label mode.
+        // By default the inset autocomplete should show the clear button when not explicitly
+        // overwritten or in floating label mode.
         if (!angular.isDefined(attrs.mdClearButton) && !scope.floatingLabel) {
           scope.clearButton = true;
         }
@@ -309,10 +365,16 @@ function MdAutocomplete ($$mdSvgRegistry) {
               role="presentation">\
             <ul class="md-autocomplete-suggestions"\
                 ng-class="::menuClass"\
-                id="ul-{{$mdAutocompleteCtrl.id}}">\
+                id="ul-{{$mdAutocompleteCtrl.id}}"\
+                role="listbox">\
               <li md-virtual-repeat="item in $mdAutocompleteCtrl.matches"\
                   ng-class="{ selected: $index === $mdAutocompleteCtrl.index }"\
+                  ng-attr-id="{{$index === $mdAutocompleteCtrl.index ? \'selected_option\' : undefined}}"\
                   ng-click="$mdAutocompleteCtrl.select($index)"\
+                  role="option"\
+                  aria-setsize="{{$mdAutocompleteCtrl.matches.length}}"\
+                  aria-posinset="{{$index+1}}"\
+                  aria-selected="{{$index === $mdAutocompleteCtrl.index ? true : false}}" \
                   md-extra-name="$mdAutocompleteCtrl.itemName">\
                   ' + itemTemplate + '\
                   </li>' + noItemsTemplate + '\
@@ -324,7 +386,8 @@ function MdAutocomplete ($$mdSvgRegistry) {
         var templateTag = element.find('md-item-template').detach(),
             html = templateTag.length ? templateTag.html() : element.html();
         if (!templateTag.length) element.empty();
-        return '<md-autocomplete-parent-scope md-autocomplete-replace>' + html + '</md-autocomplete-parent-scope>';
+        return '<md-autocomplete-parent-scope md-autocomplete-replace>' + html +
+               '</md-autocomplete-parent-scope>';
       }
 
       function getNoItemsTemplate() {
@@ -343,60 +406,56 @@ function MdAutocomplete ($$mdSvgRegistry) {
             <md-input-container ng-if="floatingLabel">\
               <label>{{floatingLabel}}</label>\
               <input type="search"\
-                  ' + (tabindex != null ? 'tabindex="' + tabindex + '"' : '') + '\
-                  id="{{ inputId || \'fl-input-\' + $mdAutocompleteCtrl.id }}"\
-                  name="{{inputName}}"\
-                  ng-class="::inputClass"\
-                  autocomplete="off"\
-                  ng-required="$mdAutocompleteCtrl.isRequired"\
-                  ng-readonly="$mdAutocompleteCtrl.isReadonly"\
-                  ng-minlength="inputMinlength"\
-                  ng-maxlength="inputMaxlength"\
-                  ng-disabled="$mdAutocompleteCtrl.isDisabled"\
-                  ng-model="$mdAutocompleteCtrl.scope.searchText"\
-                  ng-model-options="{ allowInvalid: true }"\
-                  ng-keydown="$mdAutocompleteCtrl.keydown($event)"\
-                  ng-blur="$mdAutocompleteCtrl.blur($event)"\
-                  ng-focus="$mdAutocompleteCtrl.focus($event)"\
-                  ' + (attr.placeholder != null ? 'placeholder="{{placeholder}}"' : '') + '\
-                  aria-owns="ul-{{$mdAutocompleteCtrl.id}}"\
-                  ' + (attr.mdNoAsterisk != null ? 'md-no-asterisk="' + attr.mdNoAsterisk + '"' : '') + '\
-                  ' + (attr.mdSelectOnFocus != null ? 'md-select-on-focus=""' : '') + '\
-                  ' + (attr.placeholder != null ? 'aria-label="{{placeholder}}"' : 'aria-label="{{floatingLabel}}"') + '\
-                  aria-autocomplete="list"\
-                  role="combobox"\
-                  aria-haspopup="true"\
-                  aria-activedescendant=""\
-                  aria-expanded="{{!$mdAutocompleteCtrl.hidden}}"/>\
+                ' + (tabindex != null ? 'tabindex="' + tabindex + '"' : '') + '\
+                id="{{ inputId || \'fl-input-\' + $mdAutocompleteCtrl.id }}"\
+                name="{{inputName}}"\
+                ng-class="::inputClass"\
+                autocomplete="off"\
+                ng-required="$mdAutocompleteCtrl.isRequired"\
+                ng-readonly="$mdAutocompleteCtrl.isReadonly"\
+                ng-minlength="inputMinlength"\
+                ng-maxlength="inputMaxlength"\
+                ng-disabled="$mdAutocompleteCtrl.isDisabled"\
+                ng-model="$mdAutocompleteCtrl.scope.searchText"\
+                ng-model-options="{ allowInvalid: true }"\
+                ng-keydown="$mdAutocompleteCtrl.keydown($event)"\
+                ng-blur="$mdAutocompleteCtrl.blur($event)"\
+                ng-focus="$mdAutocompleteCtrl.focus($event)"\
+                aria-label="{{floatingLabel}}"\
+                aria-autocomplete="list"\
+                role="combobox"\
+                aria-haspopup="true"\
+                aria-expanded="{{!$mdAutocompleteCtrl.hidden}}"\
+                aria-owns="ul-{{$mdAutocompleteCtrl.id}}"\
+                ng-attr-aria-activedescendant="{{$mdAutocompleteCtrl.index >= 0 ? \'selected_option\' : undefined}}">\
               <div md-autocomplete-parent-scope md-autocomplete-replace>' + leftover + '</div>\
             </md-input-container>';
         } else {
           return '\
             <input type="search"\
-                ' + (tabindex != null ? 'tabindex="' + tabindex + '"' : '') + '\
-                id="{{ inputId || \'input-\' + $mdAutocompleteCtrl.id }}"\
-                name="{{inputName}}"\
-                ng-class="::inputClass"\
-                ng-if="!floatingLabel"\
-                autocomplete="off"\
-                ng-required="$mdAutocompleteCtrl.isRequired"\
-                ng-disabled="$mdAutocompleteCtrl.isDisabled"\
-                ng-readonly="$mdAutocompleteCtrl.isReadonly"\
-                ng-minlength="inputMinlength"\
-                ng-maxlength="inputMaxlength"\
-                ng-model="$mdAutocompleteCtrl.scope.searchText"\
-                ng-keydown="$mdAutocompleteCtrl.keydown($event)"\
-                ng-blur="$mdAutocompleteCtrl.blur($event)"\
-                ng-focus="$mdAutocompleteCtrl.focus($event)"\
-                placeholder="{{placeholder}}"\
-                aria-owns="ul-{{$mdAutocompleteCtrl.id}}"\
-                ' + (attr.mdSelectOnFocus != null ? 'md-select-on-focus=""' : '') + '\
-                aria-label="{{placeholder}}"\
-                aria-autocomplete="list"\
-                role="combobox"\
-                aria-haspopup="true"\
-                aria-activedescendant=""\
-                aria-expanded="{{!$mdAutocompleteCtrl.hidden}}"/>';
+              ' + (tabindex != null ? 'tabindex="' + tabindex + '"' : '') + '\
+              id="{{ inputId || \'input-\' + $mdAutocompleteCtrl.id }}"\
+              name="{{inputName}}"\
+              ng-class="::inputClass"\
+              ng-if="!floatingLabel"\
+              autocomplete="off"\
+              ng-required="$mdAutocompleteCtrl.isRequired"\
+              ng-disabled="$mdAutocompleteCtrl.isDisabled"\
+              ng-readonly="$mdAutocompleteCtrl.isReadonly"\
+              ng-minlength="inputMinlength"\
+              ng-maxlength="inputMaxlength"\
+              ng-model="$mdAutocompleteCtrl.scope.searchText"\
+              ng-keydown="$mdAutocompleteCtrl.keydown($event)"\
+              ng-blur="$mdAutocompleteCtrl.blur($event)"\
+              ng-focus="$mdAutocompleteCtrl.focus($event)"\
+              placeholder="{{placeholder}}"\
+              aria-label="{{placeholder}}"\
+              aria-autocomplete="list"\
+              role="combobox"\
+              aria-haspopup="true"\
+              aria-expanded="{{!$mdAutocompleteCtrl.hidden}}"\
+              aria-owns="ul-{{$mdAutocompleteCtrl.id}}"\
+              ng-attr-aria-activedescendant="{{$mdAutocompleteCtrl.index >= 0 ? \'selected_option\' : undefined}}">';
         }
       }
 

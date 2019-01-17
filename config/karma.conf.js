@@ -1,13 +1,11 @@
-const sauceBrowsers = require('./sauce-browsers.json');
 const path = require('path');
 
 module.exports = function(config) {
 
   const UNCOMPILED_SRC = [
 
-    // To enabled use of `gulp karma-watch`,
-    // don't use the dist/angular-material.js
-    //
+    // To enable use of `gulp karma-watch`,
+    // don't use the dist/angular-material.js.
     //'dist/angular-material.js',   // Un-minified source
 
 
@@ -47,13 +45,21 @@ module.exports = function(config) {
   const testSrc = process.env.KARMA_TEST_COMPRESSED ? COMPILED_SRC : UNCOMPILED_SRC;
 
   config.set({
-
     basePath: path.join(__dirname, '/..'),
+    plugins: [
+      require("karma-jasmine"),
+      require("karma-chrome-launcher"),
+      require('karma-firefox-launcher'),
+      require('karma-browserstack-launcher'),
+      require('karma-sauce-launcher')
+    ],
     frameworks: ['jasmine'],
     files: dependencies.concat(testSrc),
-    customLaunchers: sauceBrowsers,
 
-    browserDisconnectTimeout:500,
+    browserDisconnectTimeout: 10000,
+    browserDisconnectTolerance: 3,
+    browserNoActivityTimeout: 10000,
+    captureTimeout: 10000,
 
     logLevel: config.LOG_DEBUG,
     port: 9876,
@@ -62,8 +68,16 @@ module.exports = function(config) {
 
     // Continuous Integration mode
     // enable / disable watching file and executing tests whenever any file changes
-    singleRun: true,
-    autoWatch: false,
+    singleRun: false,
+    autoWatch: true,
+
+    // Try Websocket for a faster transmission first. Fallback to polling if necessary.
+    transports: ['websocket', 'polling'],
+
+    browserConsoleLogOptions: {
+      terminal: true,
+      level: 'log'
+    },
 
     // Start these browsers, currently available:
     // - Chrome
@@ -77,8 +91,7 @@ module.exports = function(config) {
 
     client: {
       // Do not clear the context as this can cause reload failures with Jasmine
-      clearContext:false
+      clearContext: false
     }
   });
-
 };

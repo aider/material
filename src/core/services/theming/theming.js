@@ -149,7 +149,7 @@ var GENERATED = { };
 var PALETTES;
 
 // Text Colors on light and dark backgrounds
-// @see https://www.google.com/design/spec/style/color.html#color-text-background-colors
+// @see https://material.io/archive/guidelines/style/color.html#color-usability
 var DARK_FOREGROUND = {
   name: 'dark',
   '1': 'rgba(0,0,0,0.87)',
@@ -281,6 +281,7 @@ function ThemingProvider($mdColorPalette, $$mdMetaProvider) {
       PALETTES[THEMES[theme].colors[options.palette || 'primary'].name];
 
     var color = angular.isObject(palette[hue]) ? palette[hue].hex : palette[hue];
+    if (color.substr(0, 1) !== '#') color = '#' + color;
 
     return setBrowserColor(color);
   };
@@ -574,6 +575,8 @@ function ThemingProvider($mdColorPalette, $$mdMetaProvider) {
    * @description
    * Service that makes an element apply theming related <b>classes</b> to itself.
    *
+   * For more information on the hue objects, their default values, as well as valid hue values, please visit <a ng-href="Theming/03_configuring_a_theme#specifying-custom-hues-for-color-intentions">the custom hues section of Configuring a Theme</a>.
+   *
    * <hljs lang="js">
    * // Example component directive that we want to apply theming classes to.
    * app.directive('myFancyDirective', function($mdTheming) {
@@ -585,7 +588,27 @@ function ThemingProvider($mdColorPalette, $$mdMetaProvider) {
    *
    *       $mdTheming.defineTheme('myTheme', {
    *         primary: 'blue',
+   *         primaryHues: {
+   *           default: '500',
+   *           hue-1: '300',
+   *           hue-2: '900',
+   *           hue-3: 'A100'
+   *         },
    *         accent: 'pink',
+   *         accentHues: {
+   *           default: '600',
+   *           hue-1: '300',
+   *           hue-2: '200',
+   *           hue-3: 'A500'
+   *         },
+   *         warn: 'red',
+   *         // It's not necessary to specify all hues in the object.
+   *         warnHues: {
+   *           default: '200',
+   *           hue-3: 'A100'
+   *         },
+   *         // It's not necessary to specify custom hues at all.
+   *         background: 'grey',
    *         dark: true
    *       });
    *       // Your directive's custom code here.
@@ -637,9 +660,10 @@ function ThemingProvider($mdColorPalette, $$mdMetaProvider) {
    * You can disable this in the configuration section using the
    * `$mdThemingProvider.generateThemesOnDemand(true);`
    *
-   * The theme name that is passed in must match the name of the theme that was defined as part of the configuration block.
+   * The theme name that is passed in must match the name of the theme that was defined as part of
+   * the configuration block.
    *
-   * @param name {string} theme name to generate
+   * @param {string} name theme name to generate
    */
 
   /**
@@ -650,9 +674,11 @@ function ThemingProvider($mdColorPalette, $$mdMetaProvider) {
    * <a href="https://developers.google.com/web/fundamentals/design-and-ui/browser-customization/theme-color">
    *   Web Fundamentals</a>.
    * @param {object=} options Options for the browser color, which include:<br/>
-   * - `theme` - `{string}`: A defined theme via `$mdThemeProvider` to use the palettes from. Default is `default` theme. <br/>
-   * - `palette` - `{string}`:  Can be any one of the basic material design palettes, extended defined palettes, or `primary`,
-   *  `accent`, `background`, and `warn`. Default is `primary`.<br/>
+   * - `theme` - `{string}`: A defined theme via `$mdThemeProvider` to use the palettes from.
+   *    Default is `default` theme. <br/>
+   * - `palette` - `{string}`:  Can be any one of the basic material design palettes, extended
+   *    defined palettes, or `primary`, `accent`, `background`, and `warn`. Default is `primary`.
+   * <br/>
    * - `hue` -  `{string}`: The hue from the selected palette. Default is `800`.<br/>
    * @returns {function} Function that removes the browser coloring when called.
    */
@@ -667,9 +693,13 @@ function ThemingProvider($mdColorPalette, $$mdMetaProvider) {
    * @param {object} options Theme definition options
    * Options are:<br/>
    * - `primary` - `{string}`: The name of the primary palette to use in the theme.<br/>
+   * - `primaryHues` - `{object=}`: Override hues for primary palette.<br/>
    * - `accent` - `{string}`: The name of the accent palette to use in the theme.<br/>
+   * - `accentHues` - `{object=}`: Override hues for accent palette.<br/>
    * - `warn` - `{string}`: The name of the warn palette to use in the theme.<br/>
+   * - `warnHues` - `{object=}`: Override hues for warn palette.<br/>
    * - `background` - `{string}`: The name of the background palette to use in the theme.<br/>
+   * - `backgroundHues` - `{object=}`: Override hues for background palette.<br/>
    * - `dark` - `{boolean}`: Indicates if it's a dark theme.<br/>
    * @returns {Promise<string>} A resolved promise with the new theme name.
    */
@@ -708,16 +738,16 @@ function ThemingProvider($mdColorPalette, $$mdMetaProvider) {
       var theme = registerTheme(name);
 
       if (options.primary) {
-        theme.primaryPalette(options.primary);
+        theme.primaryPalette(options.primary, options.primaryHues);
       }
       if (options.accent) {
-        theme.accentPalette(options.accent);
+        theme.accentPalette(options.accent, options.accentHues);
       }
       if (options.warn) {
-        theme.warnPalette(options.warn);
+        theme.warnPalette(options.warn, options.warnHues);
       }
       if (options.background) {
-        theme.backgroundPalette(options.background);
+        theme.backgroundPalette(options.background, options.backgroundHues);
       }
       if (options.dark){
         theme.dark();
